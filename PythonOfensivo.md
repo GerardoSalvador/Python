@@ -732,6 +732,8 @@ except ZeroDivisionError: # Se define el tipo de error para ser específico
     print("No se puede dividir un número entre cero")
 except TypeError: # Se define otro tipo de error
     print("No se puede dividir entre diferentes tipos de datos")
+except:
+    ("Esta excepcion la estoy agregando para añadir el except sin un tipo de error")
 ```
 
 > No se puede dividir entre diferentes tipos de datos
@@ -1248,7 +1250,7 @@ Los decoradores son una herramienta poderosa en Python que permite modificar el 
 
 Un método de clase es un método que está ligado a la clase y no a una instancia de la clase. Esto significa que el método puede ser llamado sobre la clase misma, en lugar de sobre un objeto de la clase. Se definen utilizando el decorador '@classmethod' y su primer argumento es siempre una referencia a la clase, convencionalmente llamada 'cls'. Los métodos de clase son utilizados a menudo para definir métodos "factory" que pueden crear instancias de la clase de diferentes maneras.
 
-### Métodos estáticos
+### Métodos estáticos 1/2
 
 Los métodos estáticos, definidos con el decorador '@staticmethod', no reciben una referencia implícita ni a la instancia (self) ni a la clase (cls). Son básicamente como funciones regulares, pero pertenecen al espacio de nombre de la clase. Son útiles cuando queremos realizar alguna funcionalidad que está relacionada con la clase, pero que no requiere acceder a la instancia o a los atributos de la clase.
 
@@ -1351,3 +1353,222 @@ print(f"\n[+] El precio del libro con IVA es de {LibroDigital.precio_con_iva(mi_
 > [+] El precio del libro con IVA es de 22.
 
 ## Métodos estáticos y métodos de clase
+
+Los métodos estáticos y los métodos de clase son dos herramientas poderosas en la programación orientada a objetos en Python, que ofrecen flexibilidad en cómo se puede acceder y utilizar la funcionalidad asociada con una clase.
+
+### Métodos de clase
+
+Se definen con el decorador '@classmethod', lo que les permite tomar la clase como primer argumento, generalmente nombrada 'cls'. Este acceso a la clase permite que los métodos de clase interactúen con la estructura de la clase en sí, como modificar atributos de clase que afectarán a todas las instancias. Se utilizan para tareas que requieren conocimiento del estado global de la clase, como la construcción de instancias de maneras específicas, también conocidos como métodos factory.
+
+### Métodos estáticos 2/2
+
+Se definen con el decorador '@staticmethod' y no reciben un argumento implícito de referencia a la clase o instancia. Son similares a las funciones regulares definidas dentro del cuerpo de una clase.
+Se utilizan para funciones que, aunque conceptualmente pertenecen a la clase debido a la relevancia temática, no necesitan acceder a ningún dato específico de la clase o instancia.
+Proporcionan una manera de encapsular la funcionalidad dentro de una clase, manteniendo la cohesión y la organización del código.
+
+Ambos métodos contribuyen a un diseño de software más limpio y modular, permitiendo una clara separación entre la funcionalidad que opera con respecto a la clase en su totalidad y la funcionalidad que es independiente de las instancias de clase y de la clase misma.
+La elección entre utilizar un método de clase o un método estático a menudo depende del requisito específico de acceso o no a la clase o a sus instancias.
+
+---
+
+Codigo: **Ejemplo 1**
+
+```python
+#!/usr/bin/env python3
+import os
+os.system('cls' if os.name == 'nt' else 'clear') # Para limpiar terminal 
+
+# MÉTODOS ESTÁTICOS
+class Calculadora:
+
+    @staticmethod
+    def suma(num1, num2): # no se usa self porque no jugamos con objetos
+        return num1 + num2
+    
+    @staticmethod
+    def resta(num1, num2): # no se usa self porque no jugamos con objetos
+        return num1 - num2
+    
+    @staticmethod
+    def division(num1, num2):
+        return num1 / num2 if num2 != 0 else "\n[!] Error no se puede dividir un numero entre 0"
+
+print(Calculadora.suma(2,5))
+print(Calculadora.resta(8,4))
+print(Calculadora.division(8,0))
+
+# MÉTODOS DE CLASE
+class Automovil:
+    
+    def __init__(self, marca, modelo):
+        self.marca = marca
+        self.modelo = modelo
+
+    @classmethod
+    def deportivos(cls, marca):
+        return cls(marca, "Deportivo")
+    
+    @classmethod
+    def sean(cls, marca):
+        return cls(marca, "Sean")
+
+    def __str__(self):
+        return f"La marca {self.marca} es un modelo {self.modelo}"
+
+deportivo = print(Automovil.deportivos("Ferrari"))
+sean = print(Automovil.sean("Toyota"))
+```
+
+> 7 \
+> 4 \
+> [!] Error no se puede dividir un numero entre 0 \
+> La marca Ferrari es un modelo Deportivo \
+> La marca Toyota es un modelo Sean
+
+---
+
+Codigo: **Ejemplo 2**
+
+```python
+#!/usr/bin/env python3
+import os
+os.system('cls' if os.name == 'nt' else 'clear') # Para limpiar terminal 
+
+class Estudiantes:
+
+    estudiantes = []
+
+    def __init__(self, nombre, edad):
+        self.nombre = nombre
+        self.edad = edad
+
+        Estudiantes.estudiantes.append(self)
+
+    @staticmethod
+    def es_mayor_de_edad(edad):
+        return edad >= 18
+
+    @classmethod
+    def crear_estudiantes(cls, nombre, edad):
+        if cls.es_mayor_de_edad(edad):
+            return cls(nombre, edad)
+        else:
+            print(f"[!] Error: El estudiante {nombre} es menor de edad")
+
+    @staticmethod
+    def mostrar_estudiantes():
+        for i, x in enumerate(Estudiantes.estudiantes):
+            print(f"[+] Estudiante número [{i + 1}]: {x.nombre}")
+
+Estudiantes.crear_estudiantes("HackerMate", 43)
+Estudiantes.crear_estudiantes("Savitar", 28)
+Estudiantes.crear_estudiantes("Xerosec", 12)
+Estudiantes.crear_estudiantes("Hackavis", 8)
+
+Estudiantes.mostrar_estudiantes()
+
+```
+
+> [!] Error: El estudiante Xerosec es menor de edad \
+> [!] Error: El estudiante Hackavis es menor de edad \
+> [+] Estudiante número [1]: HackerMate \
+> [+] Estudiante número [2]: Savitar
+
+---
+
+Codigo: **Ejemplo 3 Externo**
+
+```python
+#!/usr/bin/env python3
+import os
+os.system('cls' if os.name == 'nt' else 'clear') # Para limpiar terminal 
+
+class Perro:
+    especie = "Canino"  # Atributo de clase
+
+    def __init__(self, nombre):
+        self.nombre = nombre  # Atributo de instancia
+
+    @classmethod
+    def cambiar_especie(cls, nueva_especie):
+        cls.especie = nueva_especie  # Modifica el atributo de clase
+
+    def ladrar(self):
+        print(f"{self.nombre} dice: ¡Guau!")
+
+# Modificación del atributo de clase
+Perro.cambiar_especie("Lobo")
+
+# Instancias
+perro1 = Perro("Rex")
+perro2 = Perro("Firulais")
+
+print(perro1.especie)  # Imprime "Lobo"
+print(perro2.especie)  # Imprime "Lobo"
+perro1.ladrar()        # Imprime "Rex dice: ¡Guau!"
+```
+
+> Lobo \
+> Lobo \
+> Rex dice: ¡Guau!
+
+Se lee de manera más detallada en esta página web [Métodos de clase](https://oregoom.com/python/metodos-clase/)
+
+## Comprendiendo mejor el uso de self
+
+El uso de self es uno de los aspectos más fundamentales y a la vez confusos para quienes se adentran en la Programación Orientada a Objetos (POO) en Python. Este identificador es crucial para entender cómo Python maneja los métodos y atributos dentro de sus clases y objetos.
+
+### Definición de 'self'
+
+A nivel conceptual, 'self' es una referencia al objeto actual dentro de la clase. Es el primer parámetro que se pasa a cualquier método de una clase en Python. A través de self, un método puede acceder y manipular los atributos del objeto y llamar a otros métodos dentro del mismo objeto.
+
+### Uso de 'self'
+
+Cuando se crea una nueva instancia de una clase, Python pasa automáticamente la instancia recién creada como el primer argumento al método '\_\_init__' y a otros métodos definidos en las clases que tienen self como su primer parámetro. Esto es lo que permite que un método opere con datos específicos del objeto y no con datos de la clase en general o de otras instancias de la clase.
+
+### Importancia de 'self'
+
+El concepto de self es importante en la POO ya que asegura que los métodos y atributos se apliquen al objeto correcto. Sin self, no podríamos diferenciar entre las operaciones y datos de diferentes instancias de una clase.
+
+```python
+#!/usr/bin/env python3
+import os
+os.system('cls' if os.name == 'nt' else 'clear') # Para limpiar terminal 
+
+class Persona:
+
+    def __init__(self, nombre, edad): # Persona.__init__(gerardo, nombre, edad)
+        self.nombre = nombre # gerardo.nombre = nombre
+        self.edad = edad # gerardo.edad = edad
+
+    def presentacion(self): # Persona.presentacion(gerardo)
+        return f"Hola soy {self.nombre} y tengo {self.edad} años" # gerardo.nombre gerardo.edad
+
+gerardo = Persona("Gerardo", 26)
+print(gerardo.presentacion())
+
+
+
+class Calculador:
+
+    def __init__(self, numero): # Calculador.__init__(calc, numero)
+        self.numero = numero # calc.numero = 5
+
+    def suma(self, otro_numero): # Calculador.suma(calc, otro_numero)
+        return self.numero + otro_numero # calc.numero + 8 -> 5 + 8
+    
+    def doble_suma(self, num1, num2): # Calculador.doble_suma(calc, 2, 9)
+        return self.suma(num1) + self.suma(num2) # calc.suma(2) + calc.suma(9) -> Calculador.suma(calc,2) + Calculador.suma(calc, 9)
+
+calc = Calculador(5)
+print(calc.suma(8))
+
+print(calc.doble_suma(2,9))
+
+```
+
+> Hola soy Gerardo y tengo 26 años \
+> 13 \
+> 21
+
+## Herencia y polimorfismo
