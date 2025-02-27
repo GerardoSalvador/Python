@@ -1113,15 +1113,18 @@ print(f"El total de ventas es {ventas_totales()}")
 
 ## Clases y objetos (1/2)
 
-La programación orienta a objetos, es un paradigma de programación que utiliza objetos y clases en su enfoque central. Es una manera de estructurar y organizar el código que refleja cómo los desarrolladores piensan sobre el mundo real y las entidades dentro de él.
+La programación orienta a objetos, es un paradigma de programación que utiliza objetos y clases en su enfoque central.
+Es una manera de estructurar y organizar el código que refleja cómo los desarrolladores piensan sobre el mundo real y las entidades dentro de él.
 
 ### Clases
 
-Las clases son los fundamentos de la POO. **Actúan como plantillas para la creación de objetos y definen atributos y comportamientos que los objetos creados a partir ella tendrán**. En Python, una clase se define con la palabra clave 'class' y proporcionan la estructura inicial para todo objeto que se derive de ella
+Las clases son los fundamentos de la POO. **Actúan como plantillas para la creación de objetos y definen atributos y comportamientos que los objetos creados a partir ella tendrán**.
+En Python, una clase se define con la palabra clave 'class' y proporcionan la estructura inicial para todo objeto que se derive de ella
 
 ### Instancias de clases
 
-**Un objeto es una instancia de una clase**. Cada vez que se crea un objeto, se está creando una isntancia que tiene su propio espacio de memoria y conjunto de valores para los atributos definidos por su clase. Los objetos encapsulan datos y funciones juntos en una entidad discreta.
+**Un objeto es una instancia de una clase**. Cada vez que se crea un objeto, se está creando una isntancia que tiene su propio espacio de memoria y conjunto de valores para los atributos definidos por su clase.
+Los objetos encapsulan datos y funciones juntos en una entidad discreta.
 
 ### Métodos de clase (1/2)
 
@@ -1136,7 +1139,6 @@ import os
 os.system('cls' if os.name == 'nt' else 'clear') # Para limpiar terminal 
 
 class Persona:
-
     def __init__(self, nombre, edad, profesion): # Definimos el constructor con los parámetros que vamos a recibir
         self.nombre = nombre
         self.edad = edad
@@ -1145,16 +1147,17 @@ class Persona:
     def saludo(self): # Persona.saludo(marcelo)
         return f"Hola soy {self.nombre} y tengo {self.edad} años"
 
-
+# Objeto = Clase(Atributos de inicio pasados al constructor)
 gerardo = Persona("Salvador", 26, "Consultor") # Estamos creando una instancia de la clase Persona, nombrando al objeto gerardo
-print(gerardo.saludo())
-
 juan = Persona("Gerardo", 21, "Pentester")
+
+print(gerardo.saludo())
 print(juan.saludo())
 ```
 
 > Hola soy Salvador y tengo 26 años \
 > Hola soy Gerardo y tengo 21 años
+
 ---
 Codigo: **Ejemplo 2**
 
@@ -1166,16 +1169,15 @@ os.system('cls' if os.name == 'nt' else 'clear') # Para limpiar terminal
 class Animal:
     
     def __init__(self, nombre, animal): # Animal.__init__(gato, nombre, animal)
-        self.nombre = nombre
+        self.nombre = nombre # Definimos los atributos
         self.animal = animal
 
-    def descripcion(self): # Animal.descripcion(obj)
+    def descripcion(self): # # Animal.descripcion(objeto)
         return f"{self.nombre} es un {self.animal}"
     
 gato = Animal("QWERTY", "Gato")
-print(gato.descripcion())
-
 perro = Animal("Canela", "Perro")
+print(gato.descripcion())
 print(perro.descripcion())
 ```
 
@@ -1192,51 +1194,40 @@ os.system('cls' if os.name == 'nt' else 'clear') # Para limpiar terminal
 
 class CuentaBancaria:
 
-    # En el constructor inicializamos el atributo dinero = 0, si no ponemos un valor el dinero estará en 0 pero si ponemos un valor si inicializará ese valor pasado por el objeto
+    # Inicializando el atributo dinero en caso que si al instanciar la clase no pasan el valor, dinero sea 0 por defecto
     def __init__(self, cuenta, nombre, dinero = 0):
         self.cuenta = cuenta
         self.nombre = nombre
         self.dinero = dinero
 
     def depositar_dinero(self, deposito): # CuentaBancaria.depositar_dinero(Gerardo)
-        self.dinero += deposito # self.dinero = dinero del objeto, deposito = dinero agregado al dinero del objeto
-        return f"[+] Se han depositado ${deposito} pesos mexicanos, el balance de la cuenta es de ${self.dinero} pesos mexicanos"
+        self.dinero += deposito # self.dinero = dinero del objeto, self.deposito = self.dinero + deposito
+        print(f"\n[+] Operación exitosa: Se han depositado {deposito}\n\tSALDO: ${self.dinero}\n")
     
     def retirar_dinero(self, retiro): #CuentaBancaria.retirar_dinero(Gerardo, retiro)
         
         if retiro > self.dinero:
-            return f"\n\033[1;31m[!] Operación denegada: Fondos insuficientes\033[0;m\n\t[!] Retiro solicitado: ${retiro}\n\t[!] Saldo actual: ${self.dinero}"
+            print(f"[!] Operación denegada: Fondos insuficientes\n")
         
         if retiro <= self.dinero:
-            self.dinero -= retiro
-            return f"\n\033[1;36m[+] Operación exitosa: Retiro aprobado\033[0;m\n\t[+] Retiro solicitado: ${retiro}\n\t[+] Saldo actual: ${self.dinero}"
+            self.dinero -= retiro # self.dinero = self.dinero - retiro
+            print(f"[+] Operación exitosa: Se han retirado ${retiro}\n\tSALDO ${self.dinero}\n")
 
+# Se inicializa el objeto con valores, instancia del objeto
+gerardo = CuentaBancaria("123454", "Gerardo Salvador", 1000)
 
-Gerardo = CuentaBancaria("4452 8133", "Jose Gerardo Salvador", 1000) # Instancia de objeto
+# Se juega con los métodos de la clase CuentaBancaria
+gerardo.depositar_dinero(500)
+gerardo.retirar_dinero(10000)
+gerardo.retirar_dinero(200)
 
-# Se usa la funcion depositar dinero para agregar dinero al objeto
-print(Gerardo.depositar_dinero(500))
-print(Gerardo.depositar_dinero(700))
-print(Gerardo.depositar_dinero(300))
-
-# Se usa la funcion retirar dinero para quitar dinero al objeto
-print(Gerardo.retirar_dinero(5000))
-print(Gerardo.retirar_dinero(500))
 ```
 
-> [+] Se han depositado $500 pesos mexicanos, el balance de la cuenta es de $1500 pesos mexicanos \
-> [+] Se han depositado $700 pesos mexicanos, el balance de la cuenta es de $2200 pesos mexicanos \
-> [+] Se han depositado $300 pesos mexicanos, el balance de la cuenta es de $2500 pesos mexicanos \
-> \
+> [+] Operación exitosa: Se han depositado 500 \
+> &nbsp; SALDO: $1500 \
 > [!] Operación denegada: Fondos insuficientes \
-> &nbsp;&nbsp;[!] Retiro solicitado: $5000 \
-> &nbsp;&nbsp;[!] Saldo actual: $2500 \
-> \
-> [+] Operación exitosa: Retiro aprobado \
-> &nbsp;&nbsp;[+] Retiro solicitado: $500 \
-> &nbsp;&nbsp;[+] Saldo actual: $2000
-
----
+> [+] Operación exitosa: Se han retirado $200 \
+> &nbsp; SALDO $1300
 
 ## Clases y objetos (2/2)
 
@@ -1244,15 +1235,21 @@ Dentro del paradigma de la Programación Orientada a Objetos en Python, existen 
 
 ### Decoradores
 
-Los decoradores son una herramienta poderosa en Python que permite modificar el comportamiento de una función o método. Funcionan como 'envoltorios', que agregan funcionalidad antes y después del método o función decorada, sin cambiar su código fuente. En POO, los decoradores son frecuentemente utilizados para agregar funcionalidades de manera dinámica a los métodos, como la sincronización de hilos, la memorización de resultados o la verificación de permisos.
+Los decoradores son una herramienta poderosa en Python que permite modificar el comportamiento de una función o método.
+Funcionan como 'envoltorios', que agregan funcionalidad antes y después del método o función decorada, sin cambiar su código fuente.
+En POO, los decoradores son frecuentemente utilizados para agregar funcionalidades de manera dinámica a los métodos, como la sincronización de hilos, la memorización de resultados o la verificación de permisos.
 
 ### Métodos de clase (2/2)
 
-Un método de clase es un método que está ligado a la clase y no a una instancia de la clase. Esto significa que el método puede ser llamado sobre la clase misma, en lugar de sobre un objeto de la clase. Se definen utilizando el decorador '@classmethod' y su primer argumento es siempre una referencia a la clase, convencionalmente llamada 'cls'. Los métodos de clase son utilizados a menudo para definir métodos "factory" que pueden crear instancias de la clase de diferentes maneras.
+Un método de clase es un método que está ligado a la clase y no a una instancia de la clase.
+Esto significa que el método puede ser llamado sobre la clase misma, en lugar de sobre un objeto de la clase.
+Se definen utilizando el decorador *'@classmethod'* y su primer argumento es siempre una referencia a la clase, convencionalmente llamada 'cls'.
+Los métodos de clase son utilizados a menudo para definir métodos "factory" que pueden crear instancias de la clase de diferentes maneras.
 
 ### Métodos estáticos 1/2
 
-Los métodos estáticos, definidos con el decorador '@staticmethod', no reciben una referencia implícita ni a la instancia (self) ni a la clase (cls). Son básicamente como funciones regulares, pero pertenecen al espacio de nombre de la clase. Son útiles cuando queremos realizar alguna funcionalidad que está relacionada con la clase, pero que no requiere acceder a la instancia o a los atributos de la clase.
+Los métodos estáticos, definidos con el decorador *'@staticmethod'*, no reciben una referencia implícita ni a la instancia (self) ni a la clase (cls). Son básicamente como funciones regulares, pero pertenecen al espacio de nombre de la clase.
+Son útiles cuando queremos realizar alguna funcionalidad que está relacionada con la clase, pero que no requiere acceder a la instancia o a los atributos de la clase.
 
 Estos elementos de la POO en Python nos permiten crear abstracciones más claras y mantener el código organizado, modular y flexible, facilitando el mantenimiento y la extensibilidad del software.
 
@@ -1266,46 +1263,47 @@ import os
 os.system('cls' if os.name == 'nt' else 'clear') # Para limpiar terminal 
 
 class Rectangulo:
+    
     def __init__(self, ancho, alto):
         self.ancho = ancho
         self.alto = alto
 
-    # Sin emplear decorador
+    # Con este decorador estoy convirtiendo el resultado de este método a una propiedad, de tal manera si quisiera verla directamente como una propiedad de las que se definen en el constructor sin emplear parentesis
+    @property
     def area(self): # Rectangulo.area(rect1)
-        return self.alto * self.ancho
+        return self.ancho * self.alto
     
-    @property # Al definir esta decorador, la funcion podemos llamarla como si fuera un atributo omitiendo el uso de parentisis al llamarla
-    def areados(self):
-        return self.alto * self.ancho
+    # Método especial que al estar definido nos muestra información del objeto al que estamos pasandole un print(objeto), sin definir este método especial, al hacer print nos reportaria que es un objeto
+    def __str__(self):
+        return f"[+] Propiedades del Rectangulo:\n\tAncho:\t{self.ancho}\n\tAlto:\t{self.alto}\n\tArea:\t{self.area}\n"
     
+    # Método especial que nos devuelve un valor booleano para comparar ambos objetos
+    def __eq__(self, otro):
+        return self.alto == otro.alto and self.ancho == otro.ancho
 
-    def __str__(self): # Método especial, este método especial sustituye la salida por default que nos devolveria al imprimir el objeto sin parentesis, reportandonos que es un objeto
-        return f"\n[+] Propiedades del rectangulo\n\tAncho:{self.ancho}\n\tAlto:{self.alto}\n[!] Sustituyendo la salida por defecto:\n\t<__main__.Rectangulo object at 0x0000024A9E726A50>"
-    
-    def __eq__(self, otro):# Método especial que debe ser declarado para poder usarlo
-        
-        return self.ancho == otro.ancho and self.alto == otro.alto
+rect1 = Rectangulo(20,89)
+rect2 = Rectangulo(40,35)
 
-rect1 = Rectangulo(20, 80)
-print(f"\n[+] El área es {rect1.area()}") # Uso de parentesis al llamar al método
+print(f"[+] El área es {rect1.area}\n")
+print(f"[+] El área es {rect2.area}\n")
 
-rect2 = Rectangulo(20,800)
-print(f"\n[+] El área es {rect2.areados}") # Omito el uso de parentesis al llamar al método @property
+# Al pedir la impresion para saber que son estos valores, nos buscará por el método especial __str__ y si esta definido nos mostrará lo que hayamos especificado, de otra manera, nos dirá que es un objeto
+print(rect1) 
+print(rect2)
 
-print(rect1) # Omitimos el uso de rect1() porque la salida convencional ha sido modificado con el metodo especial str
-
-print(f"\n[+] ¿Son iguales? -> {rect1 == rect2}") # Definido con metodo especial eq
+# Al establecer esta igualdad al hacer print, nos buscará el método especial __eq__ para hacer la comparacion y nos devolverá un boolean
+print(rect1==rect2)
 ```
 
-> [+] El área es 1600 \
-> \
-> [+] Propiedades del rectangulo \
-> &nbsp;Ancho:20 \
-> &nbsp;Alto:80 \
-> [!] Sustituyendo la salida por defecto:\
-> &nbsp;<\_\_main__.Rectangulo object at 0x0000024A9E726A50>\
-> \
-> [+] ¿Son iguales? -> False
+> [+] Propiedades del Rectangulo: \
+> &nbsp; Ancho:  20 \
+> &nbsp; Alto:   89 \
+> &nbsp; Area:   1780 \
+> [+] Propiedades del Rectangulo: \
+> &nbsp; Ancho:  40 \
+> &nbsp; Alto:   35 \
+> &nbsp; Area:   1400 \
+> False
 
 ---
 
@@ -1315,42 +1313,83 @@ Codigo: **Ejemplo 2**
 #!/usr/bin/env python3
 import os
 os.system('cls' if os.name == 'nt' else 'clear') # Para limpiar terminal 
+
 class Libro:
 
-    IVA = 0.20
+    # Variable de clase
+    best_seller_value = 5000
 
     def __init__(self, titulo, autor, precio):
         self.titulo = titulo
         self.autor = autor
         self.precio = precio
+        return
     
-    @staticmethod # Decorador, no necesitan acceder a las propiedades del objeto
-    def es_best_seller(total_ventas): # Libro.es_best_seller(total_ventas) #omitimos el uso del objeto para este tipo de metodos porque hacemos referencia a la clase y ya no a un método
-        return total_ventas > 5000
+    # El método estático no necesita que le pasen el objeto, puesto que no accedemos a ninguna de las propiedades del objeto para llevar a cabo nuestra operatoria.
+    # Decorador, como argumento no necesitan que le pasen el objeto, o acceder a sus propiedades, no necesitamos acceder a ninguna de las propiedades del objeto para llevar a cabo nuestra operacion
+    @staticmethod
+    def es_best_seller(venta):
+        print(venta > Libro.best_seller_value) # Para referenciar a las variables de clase, hay que llamar a la clase
+
+mi_libro = Libro("Como ser un Lammer?", "Gerardo", 12)
+
+# Como es un método estático de la clase, en vez de referenciar al objeto mi_libro.es_best_seller(7000) se referencia a la clase Libro.es_best_seller
+Libro.es_best_seller(7000)
+```
+
+> True
+
+---
+
+Codigo: **Ejemplo 3**
+
+```python
+#!/usr/bin/env python3
+import os
+os.system('cls' if os.name == 'nt' else 'clear') # Para limpiar terminal 
+
+class Libro:
+
+    # Variable de clase
+    best_seller_value = 5000
+    IVA = 0.21
+
+    def __init__(self, titulo, autor, precio):
+        self.titulo = titulo
+        self.autor = autor
+        self.precio = precio
+        return
     
+    # El método estático no necesita que le pasen el objeto, puesto que no accedemos a ninguna de las propiedades del objeto para llevar a cabo nuestra operatoria.
+    # Decorador, como argumento no necesitan que le pasen el objeto, o acceder a sus propiedades, no necesitamos acceder a ninguna de las propiedades del objeto para llevar a cabo nuestra operacion
+    @staticmethod
+    def es_best_seller(venta):
+        print(venta > Libro.best_seller_value) # Para referenciar a las variables de clase, hay que llamar a la clase
+
+
+    # El decorador recibe como argumento la clase y para este ejemplo la clase nos determina que iva aplicar, puesto que la clase la trae el objeto al ser instanciado
     @classmethod
     def precio_con_iva(cls, precio):
-        return precio + precio * cls.IVA
-    
-class LibroDigital(Libro): # Creamos otra clase que hereda los atributos y métodos de la clase libro
-    IVA = 0.10 # El iva es la unica constante que va a cambiar con respecto a la clase libro
+        print(precio + precio * cls.IVA)
 
-        
-mi_libro = Libro("¿Cómo ser un lammer?", "Gerardo", 20) # Instancia de clase Libro
-mi_libro_digital = LibroDigital("Iniciacion a lammer", "Gerardo Salvador", 20) # Instancia de clase Libro Digital
 
-#print(mi_libro.es_best_seller(7000)) # este nos manda error porque ya no necesitamos pasar un objeto sino la clase
-print(Libro.es_best_seller(7000))
+class LibroDigital(Libro):
+    IVA = 0.10
 
-print(f"\n[+] El precio del libro con IVA es de {Libro.precio_con_iva(mi_libro.precio)}")
-print(f"\n[+] El precio del libro con IVA es de {LibroDigital.precio_con_iva(mi_libro_digital.precio)}")
+mi_libro = Libro("Como ser un Lammer?", "Gerardo", 17.5)
+mi_libro_digital = LibroDigital("Ser o no ser", "Salvador", 17.5)
+
+# Como es un método estático de la clase, en vez de referenciar al objeto mi_libro.es_best_seller(7000) se referencia a la clase Libro.es_best_seller
+Libro.es_best_seller(7000)
+
+# precio_con_iva(clase, precio_con_iva(objeto.precio))
+Libro.precio_con_iva(mi_libro.precio)
+LibroDigital.precio_con_iva(mi_libro_digital.precio)
 ```
 
 > True \
-> \
-> [+] El precio del libro con IVA es de 24.0 \
-> \
-> [+] El precio del libro con IVA es de 22.
+> 21.175 \
+> 19.25
 
 ## Métodos estáticos y métodos de clase
 
@@ -1572,3 +1611,832 @@ print(calc.doble_suma(2,9))
 > 21
 
 ## Herencia y polimorfismo
+
+La herencia y el polimorfismo son conceptos fundamentales en la programación orientada a objetos que permiten la creación de una estructura de clases flexible y reutilizable.
+
+### Herencia
+
+Es un principio de la POO que permite a una clase heredar atributos y métodos de otra clase, conocida como su clase base o superclase.
+La herencia facilita la reutilización de código y la creación de una jerarquía de clases. Las subclases heredan las características de la superclase, lo que permite que se especialicen o modifiquen comportamientos existentes.
+
+### Polimorfismo
+
+Este concepto se refiere a la habilidad de objetos de diferentes clases de ser tratados como instancias de una clase común.
+El polimorfismo permite que una función o método interactúe con objetos de diferentes clases y los trate como si fueran del mismo tipo, siempre y cuando compartan la misma interfaz o método.
+Esto significa que el mismo método puede comportarse de manera diferente en distintas clases, un concepto conocido como sobrecarga de métodos.
+
+Ambos, la herencia y el polimorfismo, son piedras angulares de la POO y son ampliamente utilizados para diseñar sistemas que son fácilmente extensibles y mantenibles.
+
+---
+
+Codigo: **Ejemplo 1** HERENCIA
+
+```python
+#!/usr/bin/env python3
+import os
+os.system('cls' if os.name == 'nt' else 'clear') # Para limpiar terminal 
+
+class Animal:
+    def __init__(self, nombre):
+        self.nombre=nombre
+
+    def hablar(self):
+        raise NotImplementedError("Las subclases definidas deben implementar este método")
+    
+class Perro(Animal):
+    def hablar(self):
+        return f"{self.nombre} dice Guauuu"
+
+class Gato(Animal):
+    def hablar(self):
+        return f"{self.nombre} dice Miau"
+    
+bety=Gato("Bety")
+canela=Perro("Canela")
+loro=Animal("Lorenzo")
+
+print(bety.hablar())
+print(canela.hablar())
+print(loro.hablar())
+
+```
+
+> Bety dice Miau \
+> Canela dice Guauuu \
+> Muestra error en consola con la especificacion
+
+---
+
+Codigo: **Ejemplo 2** POLIMORFISMO
+
+```python
+#!/usr/bin/env python3
+import os
+os.system('cls' if os.name == 'nt' else 'clear') # Para limpiar terminal 
+
+class Animal:
+    def __init__(self, nombre):
+        self.nombre=nombre
+
+    def hablar(self):
+        raise NotImplementedError("Las subclases definidas deben implementar este método")
+    
+class Perro(Animal):
+    def hablar(self):
+        return f"Guauuu"
+
+class Gato(Animal):
+    def hablar(self):
+        return f"Miau"
+    
+def hacer_hablar(objeto):
+    print(f"{objeto.nombre} dice {objeto.hablar()}")
+    
+bety=Gato("Bety")
+canela=Perro("Canela")
+loro=Animal("Lorenzo")
+
+hacer_hablar(bety)
+hacer_hablar(canela)
+
+```
+
+> Bety dice Miau \
+> Canela dice Guauuu
+
+---
+
+Codigo: **Ejemplo 3**
+
+```python
+#!/usr/bin/env python3
+import os
+os.system('cls' if os.name == 'nt' else 'clear') # Para limpiar terminal 
+
+class Automovil:
+    def __init__(self, marca, modelo):
+        self.marca=marca
+        self.modelo=modelo
+
+    def describir(self):
+        return f"Vehiculos: {self.marca} {self.modelo}"
+
+class Coche(Automovil):
+    def describir(self):
+        return f"Coche: {self.marca} {self.modelo}"
+
+class Moto(Automovil):
+    def describir(self):
+        return f"Moto: {self.marca} {self.modelo}"
+
+# Polimorfismo    
+def describir_vehiculo(vehiculo):
+    print(vehiculo.describir())
+
+coche = Coche("Toyoto", "Corolo")
+moto = Moto("Honda", "CBR")
+
+describir_vehiculo(coche)
+describir_vehiculo(moto)
+
+```
+
+> Coche: Toyota Corola \
+> Honda CBR
+
+---
+
+Codigo: **Ejemplo 4**
+
+```python
+#!/usr/bin/env python3
+import os
+os.system('cls' if os.name == 'nt' else 'clear') # Para limpiar terminal 
+
+class Dispositivo:
+    def __init__(self, modelo):
+        self.modelo=modelo
+
+    def escanear_vulnerabilidades(self):
+        raise NotImplementedError("Este metodo debe ser definido para el resto de subclases existentes")
+    
+class Ordenador(Dispositivo):
+    def escanear_vulnerabilidades(self):
+        return f"[+] Análisis de vulnerabilidades concluido: Actualizacion de software necesaria, multiples desactualizaciones de software detectadas"
+    
+class Router(Dispositivo):
+    def escanear_vulnerabilidades(self):
+        return f"[+] Análisis de vulnerabilidades concluido: Multiples puertos críticos detectados"
+    
+class TelefonoMovil(Dispositivo):
+    def escanear_vulnerabilidades(self):
+        return f"[+] Multiples aplicaciones detectadas con permisos excesivos"
+    
+def realizar_escaneo(dispositivo):
+    print(dispositivo.escanear_vulnerabilidades())
+    
+pc = Ordenador("Dell")
+cisco = Router("Cisco")
+xiami = TelefonoMovil("Xiaomi")
+
+realizar_escaneo(pc)
+realizar_escaneo(cisco)
+realizar_escaneo(xiami)
+
+```
+
+> [+] Análisis de vulnerabilidades concluido: Actualizacion de software necesaria, multiples desactualizaciones de software detectadas \
+> [+] Análisis de vulnerabilidades concluido: Multiples puertos críticos detectados \
+> [+] Multiples aplicaciones detectadas con permisos excesivos
+
+---
+
+Codigo: **Ejemplo 5**
+
+```python
+#!/usr/bin/env python3
+import os
+os.system('cls' if os.name == 'nt' else 'clear') # Para limpiar terminal 
+
+# Para cuando das prioridad a un metodo sobre otro, o al padre en este caso
+class A:
+    def __init__(self):
+        print("Inicializando A")
+
+class B(A):
+    def __init__(self):
+        print("Inicializando B")
+        super().__init__()
+
+b = B()
+```
+
+> Inicializando A \
+> Inicializando b
+
+---
+
+Codigo: **Ejemplo 6**
+
+```python
+#!/usr/bin/env python3
+import os
+os.system('cls' if os.name == 'nt' else 'clear') # Para limpiar terminal 
+class A:
+    def __init__(self, x):
+        self.x = x
+        print(f"Valor en x: {self.x}")
+
+class B(A):
+    def __init__(self, x, y):
+        self.y = y
+        super().__init__(x)
+        print(f"Valor en y: {self.y}")
+
+b = B(2,10)
+```
+
+> Valor en x: 2 \
+> Valor en y: 10
+
+---
+
+Codigo: **Ejemplo 7**
+
+```python
+#!/usr/bin/env python3
+import os
+os.system('cls' if os.name == 'nt' else 'clear') # Para limpiar terminal 
+class A:
+    def saludo(self):
+        return "Saludo desde A"
+
+class B(A):
+    def saludo(self):
+        original = super().saludo()
+        print(f"{original}, pero tambien saludo desde b")
+
+saludo = B()
+saludo.saludo()
+```
+
+> Saludo desde A, pero tambien saludo desde b
+
+## Encapsulación y métodos especiales
+
+El encapsulamiento en la programación orientada a objetos maneja principalmente tres niveles de visibilidad para los atributos y métodos de una clase: *públicos*, *protegidos* y *privados*. En python esta distinción se realiza mediante convenciones en la nomenclatura, más que a través de estrictas restricciones de acceso como en otros lenguajes.
+
+### Atributos Públicos
+
+Son accesibles desde cualquier parte del programa y, por convención, no tienen un prefijo especial. Se espera que estos atributos sean parte de la interfaz permanente de la clase.
+
+### Atributos Protegidos
+
+Se indica con un único guion bajo al principio del nombre (por ejemplo, ‘_atributo‘). Esto es solo una convención y no impide el acceso desde fuera de la clase, pero se entiende que estos atributos están protegidos y no deberían ser accesibles directamente, excepto dentro de la propia clase y en subclases.
+
+### Atributos Privados
+
+En Python, los atributos privados se indican con un doble guion bajo al principio del nombre (por ejemplo, ‘__atributo‘).
+Esto activa un mecanismo de cambio de nombre conocido como ‘name mangling‘, donde el intérprete de Python altera internamente el nombre del atributo para hacer más difícil su acceso desde fuera de la clase.
+
+### Métodos especiales
+
+Los métodos especiales en Python son también conocidos como métodos mágicos y son identificados por doble guion bajo al inicio y al final (‘\_\_metodo__‘).
+Permiten a las clases en Python emular el comportamiento de los tipos incorporados y responder a operadores específicos.
+Por ejemplo, el método ‘\_\_init__‘ se utiliza para inicializar una nueva instancia de una clase, ‘\_\_str__‘ se invoca para una representación en forma de cadena legible del objeto y ‘\_\_len__‘ devuelve la longitud del objeto.
+
+Algunos métodos especiales importantes en POO son:
+
+* **\_\_init__(self, [...]):** Inicializa una nueva instancia de la clase.
+* **\_\_str__(self):** Devuelve una representación en cadena de texto del objeto, invocado por la función ‘str(object)‘ y ‘print‘.
+* **\_\_repr__(self):** Devuelve una representación del objeto que debería, en teoría, ser una expresión válida de Python, invocado por la función ‘repr(object)‘.
+* **\_\_eq__(self, other):** Define el comportamiento del operador de igualdad ‘==‘.
+* **\_\_lt__(self, other), \_\_le__(self, other), \_\_gt__(self, other), \_\_ge__(self, other):** Definen el comportamiento de los operadores de comparación (<, <=, > y >= respectivamente).
+* **\_\_add__(self, other), \_\_sub__(self, other), \_\_mul__(self, other), etc.:** Definen el comportamiento de los operadores aritméticos (+, –, *, etc.).
+
+El encapsulamiento y los métodos especiales son herramientas poderosas que, cuando se utilizan correctamente, pueden mejorar la seguridad, la flexibilidad y la claridad en la construcción de aplicaciones.
+
+---
+
+Codigo: **Ejemplo 1**
+
+```python
+#!/usr/bin/env python3
+import os
+os.system('cls' if os.name == 'nt' else 'clear') # Para limpiar terminal 
+
+class Ejemplo:
+    
+    def __init__(self):
+        
+        # Atributo protegido
+        self._atributo_protegido = "Soy un atributo protegido y no deberías poder verme"
+
+        # Atributo privado
+        self.__atributo_privado = "Soy un atributo privado y no deberías poder verme" # name mangling 
+
+ejemplo = Ejemplo()
+print(ejemplo._atributo_protegido)
+#print(ejemplo.__atributo_privado) # De esta manera no podemos ver el atributo privado
+print(ejemplo._Ejemplo__atributo_privado) # De esta manera si podemos ver el resultado
+
+```
+
+> Soy un atributo protegido y no deberías poder verme \
+> Soy un atributo privado y no deberías poder verme
+
+---
+
+Codigo: **Ejemplo 2**
+
+```python
+#!/usr/bin/env python3
+import os
+os.system('cls' if os.name == 'nt' else 'clear') # Para limpiar terminal
+class Coche:
+
+    def __init__(self, marca, modelo):
+        self.marca = marca
+        self.modelo = modelo
+        self.__kilometraje = 0 # Atributo privado
+
+    def conducir(self, kilometros):
+
+        if kilometros >= 0:
+            self.__kilometraje += kilometros
+        else:
+            print(f"\n[!] Los kilometros deben ser mayores a 0\n")
+
+    def mostrar_kilometros(self):
+        return self.__kilometraje
+
+coche = Coche("Toyto", "Corola")
+coche.conducir(150)
+print(coche.mostrar_kilometros()) # Esto si por convenio
+print(coche._Coche__kilometraje) # Esto no por convenio 
+
+```
+
+> 150 \
+> 150
+
+---
+
+Codigo: **Ejemplo 3**
+
+```python
+#!/usr/bin/env python3
+import os
+os.system('cls' if os.name == 'nt' else 'clear') # Para limpiar terminal 
+
+class Libro:
+    def __init__(self, titulo, autor):
+        self.titulo = titulo
+        self.autor = autor
+
+    def __str__(self):
+        return f"El libro '{self.titulo}' ha sido escrito por {self.autor}"
+    
+    def __eq__(self, otro):
+        return self.autor == otro.autor and self.titulo == otro.titulo
+
+libro = Libro("Gerardo lammer", "Gerardo")
+print(libro)
+
+libro_dos = Libro("Como ser un hacker", "Salvador")
+print(libro_dos)
+
+libro_tres = Libro("Gerardo lammer", "Gerardo")
+print(f"Son iguales ambos libros -> {libro == libro_tres}")
+```
+
+> El libro 'Gerardo lammer' ha sido escrito por Gerardo \
+> El libro 'Como ser un hacker' ha sido escrito por Salvador \
+> Son iguales ambos libros -> True
+
+---
+
+Codigo: **Ejemplo 4**
+
+```python
+#!/usr/bin/env python3
+import os
+os.system('cls' if os.name == 'nt' else 'clear') # Para limpiar terminal 
+
+class CuentaBancaria:
+
+    def __init__(self, num_cuenta, titular, saldo_inicial = 0):
+        self.num_cuenta = num_cuenta
+        self.titular = titular
+        self.__saldo = saldo_inicial # Atributo privado
+
+
+    def depositar_dinero(self, cantidad):
+
+        if cantidad > 0:
+            self.__saldo += cantidad
+            return f"\n[+] El saldo actual en la cuenta: {self.__saldo}"
+        else:
+            return f"El monto ha depositar es incorrecto"
+
+
+    def retirar_dinero(self, cantidad):
+        
+        if cantidad > 0:
+            if cantidad > self.__saldo:
+                return f"\n[!] La cantidad a retirar supera el monto en la cuenta\n"
+            else:
+                self.__saldo -= cantidad
+                return f"\n[+] Saldo actual en la cuenta: {self.__saldo}\n"
+        else:
+            return f"[!] El monto a retirar es incorrecto"
+
+    def mostrar_dinero(self):
+        
+        return f"\n[+] El saldo actual en la cuenta es: {self.__saldo}\n"
+
+
+manolo = CuentaBancaria("123", "Manolo vieira",1500)
+print(manolo.depositar_dinero(500))
+print(manolo.retirar_dinero(200))
+
+print(manolo.mostrar_dinero())
+```
+
+> [+] El saldo actual en la cuenta: 2000 \
+> [+] Saldo actual en la cuenta: 1800 \
+> [+] El saldo actual en la cuenta es: 1800
+
+---
+
+Codigo: **Ejemplo 5**
+
+```python
+#!/usr/bin/env python3
+import os
+os.system('cls' if os.name == 'nt' else 'clear') # Para limpiar terminal 
+
+class Caja:
+
+    def __init__(self, *items): # Se crea una tupla con la variable tupla
+        self.items = items
+
+
+    def mostrar_items(self):
+        for item in self.items:
+            print(item)
+        print(type(self.items))
+
+    def __len__(self): # Se define este metodo especial para poder usar len con el objeto, de otra manera nos daria error
+        return len(self.items)
+
+caja = Caja("Manzana", "Platano", "Kiwi", "Pera", "Sandia")
+caja.mostrar_items()
+print(len(caja))
+```
+
+> Manzana \
+> Platano \
+> Kiwi \
+> Pera \
+> Sandia \
+> <class 'tuple'> \
+> 5
+
+---
+
+Codigo: **Ejemplo 6**
+
+```python
+#!/usr/bin/env python3
+import os
+os.system('cls' if os.name == 'nt' else 'clear') # Para limpiar terminal 
+
+class Pizza:
+
+    def __init__(self, size, *ingredientes):
+        self.size = size
+        self.ingredientes = ingredientes
+        pass
+
+    def descripcion(self):
+        print(f"Esta pizza tiene {self.size} cm de longitud y los ingredientes son: {', '.join(self.ingredientes)}")
+
+
+pizza = Pizza(12, "Chorizo", "Jamon", "Bacon", "Queso")
+pizza.descripcion()
+```
+
+> Esta pizza tiene 12 cm de longitud y los ingredientes son: Chorizo, Jamon, Bacon, Queso
+
+---
+
+Codigo: **Ejemplo 7**
+
+```python
+#!/usr/bin/env python3
+import os
+os.system('cls' if os.name == 'nt' else 'clear') # Para limpiar terminal 
+
+class MiLista:
+
+    def __init__(self):
+        self.data = [1,2,3,4,5]
+
+    def __getitem__(self, index):
+        return self.data[index]
+
+lista = MiLista()
+print(lista[2])
+
+
+class Saludo:
+
+    def __init__(self, saludo):
+        self.saludo = saludo
+
+    def __call__(self, nombre):
+        return f"{self.saludo} {nombre}"
+
+hola = Saludo("¡Hola")
+print(hola("Luis!"))
+print(hola("Alberto!"))
+
+
+class Punto:
+
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def __add__(self, otro):
+        return Punto(self.x + otro.x, self.y + otro.y)
+    
+    def __str__(self):
+        return f"({self.x}, {self.y})"
+    
+
+p1 = Punto(2,8)
+p2 = Punto(10,10)
+
+print(p1 + p2) # (6,17)
+
+
+class Contador:
+
+    def __init__(self, limite):
+        self.limite = limite
+    
+    def __iter__(self):
+        self.contador = 0
+        return self
+
+    def __next__(self):
+        if self.contador < self.limite:
+            self.contador += 1
+            return self.contador
+        else:
+            raise StopIteration
+
+c = Contador(5)
+
+for i in c:
+    print(i)
+```
+
+> 3 \
+> ¡Hola Luis! \
+> ¡Hola Alberto! \
+> (12, 18) \
+> 1 \
+> 2 \
+> 3 \
+> 4 \
+> 5
+
+## Decoradores y propiedades
+
+### Decoradores 2/2
+
+Los decoradores en Python son una forma elegante de modificar las funciones o métodos. Se utilizan para extener o alterar el comportamiento de la función sin cambiar su código fuente.
+Un decorador es en sí mismo una función que toma otra función como argumento y devuelve una nueva función que, opcionalmente, puede agregar alguna funcionalidad antes y después de la función original.
+
+### Propiedades
+
+Las propiedades son un caso especial de decoradores que permiten a los desarrolladores añadir "getter", "setter" y "deleter" a los atributos de una clase de manera elegante, controlando así el acceso y la modificación de los datos.
+En Python, esto se logra con el decorador '@property', que transforma un método para acceder a un atributo como si fuera un atributo público.
+
+### Getters y setters
+
+* El "getter" obtiene el valor de un atributo manteniendo el encapsulamiento y permitiendo que se ejecute una lógica adicional durante el acceso.
+* El "setter" establece el valor de un atributo y puede incluir validación o procesamiento antes de que el cambio se refleje en el estado interno del objeto.
+* El "deleter" puede ser utilizado para definir un comportamiento cuando un atributo es eliminado con del.
+
+---
+
+Codigo: **Ejemplo 1 DECORADORES**
+
+```python
+#!/usr/bin/env python3
+import os
+os.system('cls' if os.name == 'nt' else 'clear') # Para limpiar terminal 
+
+def mi_decorador(funcion): # Funcion de orden superior
+    def envoltura():
+        print("Saludando en la envoltura del decorador antes de llamar a la función")
+        funcion() # Llamada a la función principal saludo
+        print("Saludando en la envoltura del decorador despues de llamar a la función")
+    return envoltura
+
+@mi_decorador
+def saludo():
+    print("Estoy saludando dentro de la funcion")
+
+saludo()
+```
+
+> Saludando en la envoltura del decorador antes de llamar a la función \
+> Estoy saludando dentro de la funcion \
+> Saludando en la envoltura del decorador despues de llamar a la función
+
+---
+
+Codigo: **Ejemplo 2 PROPIEDADES**
+
+```python
+#!/usr/bin/env python3
+import os
+os.system('cls' if os.name == 'nt' else 'clear') # Para limpiar terminal 
+
+class Persona:
+    def __init__(self, nombre, edad):
+        self.nombre = nombre
+        self._edad = edad
+
+    @property
+    def edad(self): # Getter, definimos esta metodo como propiedad para mandar a llamar el atributo protegido de la clase sin expresarlo explicitamente como en el constructor sino como edad
+        return self._edad
+    
+    @edad.setter # Setter, definimos este metodo para modificar el atributo protegido indirectamente, por convencion
+    def edad(self, valor):
+        if valor > 0:
+            self._edad = valor        
+        else:
+            raise ValueError("[!] Operación denegada: Edad no puede ser cero o negativa")
+
+
+gerardo = Persona("Gerardo",34)
+gerardo.edad = 12 # Setter
+gerardo.edad = -1
+print(gerardo.edad) # Getter
+```
+
+---
+
+Codigo: **Ejemplo 3**
+
+```python
+#!/usr/bin/env python3
+import os
+os.system('cls' if os.name == 'nt' else 'clear') # Para limpiar terminal 
+
+import time
+
+def cronometro(funcion):
+    def envoltura(n):
+        inicio = time.time()
+        funcion(n)
+        fin = time.time()
+        print(f"Tiempo total transcurrido en la funcion {funcion.__name__}: {fin-inicio}")
+    return envoltura
+
+
+@cronometro
+def pausa_corta(num):
+    time.sleep(num)
+
+@cronometro
+def pausa_larga(num):
+    time.sleep(num)
+
+pausa_corta(2)
+pausa_larga(3)
+```
+
+>
+
+## Módulos y paquetes en Python
+
+## Organización del código en módulos
+
+La organización del código en módulos es una práctica esencial en Python para construir programas escalables y mantenibles. Los módulos son archivos de Python que contienen definiciones y declaraciones de variables, funciones, clases u otros objetos que se pueden reutilizar en diferentes partes del programa.
+
+### Estructura de módulos
+
+Cada módulo en Python es un archivo '.py' que encapsula tu código para un propósito específico.
+Por ejemplo, puedes tener un módulo para operaciones matemáticas, otro para manejo de entradas/salidas y otro para la lógica de la interfaz de usuario.
+Esta estructura ayuda a mantener el código organizado, facilita la lectura y hace posible la reutilización de código.
+
+### Importación de módulos 1/2
+
+Python utiliza la palabra clave 'import' para utilizar módulos. Puedes importar un módulo completo, como 'import math', o importar nombres específicos de un módulo utilizando 'from math import sqrt'. Python también permite la importación de módulos con un alias para facilitar su uso dentro del código, como 'import numpy as np'.
+
+### Paquetes
+
+Cuando los programas crecen y los módulos comienzan a acumularse, Python permite organizar módulos en paquetes. Un paquete es una carpeta que contiene módulos y un archivo especial llamado '\_\_init__.py', que indica a Python que esa carpeta contiene módulos que pueden ser importados.
+
+### Ventajas de los módulos
+
+* **Mantenimiento:** Los módulos permiten trabajar en partes del código de manera independiente sin afectar otras partes del sistema.
+* **Espacio de nombres:** Los módulos definen su propio espacio de nombres, lo que significa que puedes tener funciones o clases con el mismo nombre en diferentes módulos sin conflicto.
+* **Reutilización:** El código escrito en módulos puede ser reutilizado en diferentes programas simplemente importándolos donde se necesiten.
+
+---
+
+Codigo: **Ejemplo con funciones**
+
+```python
+def suma(x, y):
+    return x + y
+def resta(x, y):
+    return x-y
+def multiplicacion(x, y):
+    return x*y
+def division(x, y):
+    if y == 0:
+        raise ValueError("No es posible dividir entre cero")
+    else:
+        return x/y
+```
+
+---
+
+Codigo: **Ejemplo de importacion de funciones**
+
+```python
+# Forma de importar 1
+import test
+# Llamado 1
+print(test.suma(4,9))
+
+# Forma de importar 2
+from test import suma, resta, multiplicacion, division
+# Llamado 2
+print(resta(10,9))
+
+
+print(multiplicacion(4,9))
+print(division(4,2))
+```
+
+> 13 \
+> 1 \
+> 36 \
+> 2
+
+---
+
+Codigo: **Ejemplo para ver que puedo usar de la libreria**
+
+```python
+import math
+print(dir(math))
+
+
+import modulo
+print(modulo.__file__) # Nos servirá para ver donde está instalado el modulo
+```
+
+> ['\_\_doc__', '\_\_loader__', '\_\_name__', '\_\_package__', '\_\_spec__', 'acos', 'acosh', 'asin', 'asinh', 'atan', 'atan2', 'atanh', 'cbrt', 'ceil', 'comb', 'copysign', 'cos', 'cosh', 'degrees', 'dist', 'e', 'erf', 'erfc', 'exp', 'exp2', 'expm1', 'fabs', 'factorial', 'floor', 'fma', 'fmod', 'frexp', 'fsum', 'gamma', 'gcd', 'hypot', 'inf', 'isclose', 'isfinite', 'isinf', 'isnan', 'isqrt', 'lcm', 'ldexp', 'lgamma', 'log', 'log10', 'log1p', 'log2', 'modf', 'nan', 'nextafter', 'perm', 'pi', 'pow', 'prod', 'radians', 'remainder', 'sin', 'sinh', 'sqrt', 'sumprod', 'tan', 'tanh', 'tau', 'trunc', 'ulp']
+
+## Importación y uso de módulos
+
+La importación y uso de módulos es una técnica fundamental en Python que permite la modularidad y la reutilización del código.
+Los módulos son archivos de Python con extensión '.py' que contienen definiciones de funciones, clases y variables que se pueden utilizar en otros scripts de Python.
+
+### Importación de módulos 2/2
+
+La declaración 'import' es usada para incluir un módulo en el script actual. Cuando importas un módulo, Python busca ese archivo en una lista de directorios definida por 'sys.path', la cual incluye el directorio actual, los directorios listados en la variable de entorno 'PYTHONPATH', y los directorios de instalación por defecto.
+
+### Uso de módulos
+
+Una vez que un módulo es importado, puedes hacer uso de sus funciones, clases y variables, utilizando la sintaxis 'nombre_del_modulo.nombre_del_elemento'.
+Esto es esencial para la organización del código, ya que permite acceder a código reutilizable sin necesidad de duplicarlo.
+
+### Importación con alias
+
+A veces, por conveniencia o para evitar conflictos de nombres, puedes querer darle a un módulo un alias al importarlo usando la palabra clave 'as': 'import modulo as alias'
+
+Esto permite acceder a los componentes del módulo usando el alias en lugar del nombre completo del módulo.
+
+### Importación específica
+
+Si solo necesitas una o varias funciones específicas de un módulo, puedes importarlas directamente usando 'from modulo import funcion'.
+Esto permite no tener que prefijar las funciones con el nombre del módulo cada vez que se llaman.
+Además, puedes importar todas las definiciones de un módulo (aunque no es una práctica recomendada) usando 'from modulo import *'.
+
+### Módulos de la biblioteca estándar
+
+Python viene con la biblioteca estándar extensa que ofrece módulos para realizar una variedad de tareas, desde manipulación de texto, fecha y hora, hasta acceso a internet y desarrollo web.
+Familiarizarse con la biblioteca estándar es crucial para ser un programador eficiente en Python.
+
+### Módulos de terceros
+
+Además de la biblioteca estándar, hay una amplia gama de módulos de terceros disponibles que puedes instalar y utilizar en tus programas.
+Estos módulos a menudo se instalan utilizando herramientas de gestión de paquetes como ‘pip‘.
+
+## Creación y distribución de paquetes
+
+## Entrada y Salida de datos
+
+### Entrada por teclado y salida por pantalla
+
+La interacción del usuario a través de la consola es una habilidad esencial en Python, y en esta clase, exploraremos las funciones que permiten la entrada y salida de datos.
+Utilizaremos ‘input()‘ para recoger la entrada del teclado y ‘print()‘ para mostrar mensajes en la pantalla.
+
+En cuanto al formato de texto, veremos cómo manejar y presentar la información de manera amigable.
+Esto incluye desde la manipulación básica de cadenas hasta técnicas más avanzadas de formateo de cadenas que permiten la inserción de variables y la alineación del texto.
+
+La codificación de caracteres es un aspecto clave para garantizar que la entrada y salida manejen adecuadamente diferentes idiomas y conjuntos de caracteres, preservando la integridad de los datos y la claridad de la comunicación en la consola.
+
+Dominar estas funciones es crucial para crear programas que requieran interacción con el usuario, y te brindarán las herramientas necesarias para construir aplicaciones interactivas robustas y fáciles de usar.
