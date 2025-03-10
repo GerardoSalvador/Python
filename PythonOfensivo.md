@@ -3352,3 +3352,109 @@ print(re.findall(patron, texto_5))
 for match in re.finditer(patron, texto_5):
     print(f"La fecha es: {match.group(0)}, la cual comienza en la posicion {match.start()} y termina en la posicion {match.end()}")
 ```
+
+### Manejo de archivos y directorios
+
+La librería ‘os‘ y el módulo ‘shutil‘ en Python son herramientas fundamentales para interactuar con el sistema de archivos, especialmente en lo que respecta a la creación y eliminación de archivos y directorios.
+
+Aquí tienes una descripción detallada de ambas:
+
+Librería os
+
+* **Funcionalidades Básicas**: ‘os’ proporciona una interfaz rica y variada para interactuar con el sistema operativo subyacente. Permite realizar operaciones como la creación y eliminación de archivos y directorios, así como la manipulación de rutas y el manejo de la información del sistema de archivos.
+
+Creación y Eliminación de Archivos y Directorios
+
+* **Creación de Directorios**: Utilizando ‘os.mkdir()‘ u ‘os.makedirs()‘, se pueden crear directorios individuales o múltiples directorios (y subdirectorios) respectivamente.
+* **Eliminación**: ‘os.remove()‘ se usa para eliminar archivos, mientras que ‘os.rmdir()‘ y ‘os.removedirs()‘ permiten eliminar directorios y directorios con subdirectorios, respectivamente.
+* **Gestión de Rutas**: La sublibrería ‘os.path‘ es crucial para manipular rutas de archivos y directorios, como unir rutas, obtener nombres de archivos, verificar si un archivo o directorio existe, etc.
+
+Módulo shutil
+
+* **Operaciones de Alto Nivel**: Mientras que os se enfoca en operaciones básicas, ‘shutil‘ proporciona funciones de nivel superior, más orientadas a tareas complejas y operaciones en lotes.
+* **Copiar y Mover Archivos y Directorios**: ‘shutil‘ es especialmente útil para copiar y mover archivos y directorios. Funciones como ‘shutil.copy()‘, ‘shutil.copytree()‘, y ‘shutil.move()‘ facilitan estas tareas.
+* **Eliminación de Directorios**: Aunque ‘os‘ puede eliminar directorios, ‘shutil.rmtree()‘ es una herramienta más poderosa para eliminar un directorio completo y todo su contenido.
+* **Manejo de Archivos Temporales**: ‘shutil‘ también ofrece funcionalidades para trabajar con archivos temporales, lo que es útil para operaciones que requieren almacenamiento temporal de datos.
+
+En resumen, ‘os‘ y ‘shutil‘ en Python son bibliotecas complementarias para la gestión de archivos y directorios. Mientras ‘os‘ ofrece una gran flexibilidad para operaciones básicas y de bajo nivel, ‘shutil‘ brinda herramientas más potentes y de alto nivel, adecuadas para tareas complejas y operaciones en lotes. Juntas, forman un conjunto integral de herramientas para la manipulación eficaz del sistema de archivos en Python.
+
+```python
+#!/usr/bin/env python3
+import os
+import shutil # para borrar directorios con contenido
+
+os.system('cls' if os.name == 'nt' else 'clear') # Para limpiar terminal 
+
+if os.path.exists("mi_archivo.txt"):
+    print(f"\n[+] El archivo existe")
+else:
+    print(f"\n[!] El archivo no existe")
+
+#if not os.path.exists("mi_directorio"):
+#    os.mkdir("mi_directorio")
+
+if not os.path.exists("mi_directorio/mi_subdirectorio"):
+    os.makedirs("mi_directorio/mi_subdirectorio")
+
+print("[+] Listando todos los recursos del directorio actual de trabajo: \n")
+recursos = os.listdir()
+for recurso in recursos:
+    print(recurso)
+
+if os.path.exists("file1.txt"):
+    os.remove("file1.txt")
+
+#if os.path.exists("mi_directorio"): # No se pueden borrar directorios con archivos con la clase OS
+#    os.removedirs("mi_directorio/mi_subdirectorio")
+
+if os.path.exists("mi_directorio"):
+    shutil.rmtree("mi_directorio")
+
+#os.rename("file2.txt", "cambiado.txt") # Para cambiar el nombre de un archivo
+
+#tamaño = os.path.getsize("/etc/passwd") # Obtiene el tamaño de un archivo
+
+ruta = os.path.join("ProyectosPOO", "notas.py")
+print(f"\n[+] Ruta: {ruta}")
+
+archivo = os.path.basename(ruta)
+directorio = os.path.dirname(ruta)
+print(f"\n[+] Nombre del archivo: {archivo}")
+print(f"\n[+] Nombre del archivo: {directorio}")
+
+print(f"\n[+] Ruta: {ruta}")
+directorio2, archivo2 = os.path.split(ruta)
+print(f"[+] Archivo: {archivo2}, Directorio: {directorio2}")
+```
+
+### Conexiones de red  y protocolos (1/4)
+
+Los protocolos TCP (Transmission Control Protocol) y UDP (User Datagram Protocol) son fundamentales en la comunicación de red, y la librería ‘socket‘ en Python proporciona las herramientas necesarias para interactuar con ellos.
+Aquí tienes una descripción detallada de ambos protocolos y el uso de ‘socket‘:
+
+#### Protocolo TCP
+
+* **Orientado a la Conexión**: TCP es un protocolo orientado a la conexión, lo que significa que establece una conexión segura y confiable entre el emisor y el receptor antes de la transmisión de datos.
+* **Fiabilidad y Control de Flujo**: Garantiza la entrega de datos sin errores y en el mismo orden en que se enviaron.También gestiona el control de flujo y la corrección de errores.
+* **Uso en Aplicaciones**: Es ampliamente utilizado en aplicaciones que requieren una entrega fiable de datos, como navegadores web, correo electrónico, y transferencia de archivos.
+
+#### Protocolo UDP
+
+* **No Orientado a la Conexión**: A diferencia de TCP, UDP es un protocolo no orientado a la conexión. Envía datagramas (paquetes de datos) sin establecer una conexión previa.
+* **Rápido y Ligero**: UDP es más rápido y tiene menos sobrecarga que TCP, ya que no verifica la llegada de paquetes ni mantiene el orden de los mismos.
+* **Uso en Aplicaciones**: Ideal para aplicaciones donde la velocidad es crucial y se pueden tolerar algunas pérdidas de datos, como juegos en línea, streaming de video y voz sobre IP (VoIP).
+
+#### Librería ‘socket’ en Python
+
+La librería ‘socket‘ en Python es una herramienta esencial para la programación de comunicaciones en red. Permite a los desarrolladores crear aplicaciones que pueden enviar y recibir datos a través de la red, ya sea en una red local o a través de Internet.
+Aquí tienes una visión general de la librería ‘socket‘:
+
+* **Creación de sockets**: La librería ‘socket‘ proporciona clases y funciones para crear sockets, que son puntos finales de comunicación. Puedes crear sockets tanto para el protocolo TCP (Transmission Control Protocol) como para UDP (User Datagram Protocol).
+* **Conexiones TCP**: Puedes utilizar ‘socket‘ para establecer conexiones TCP, que son conexiones confiables y orientadas a la conexión. Esto es útil para aplicaciones que requieren transferencia de datos confiable, como la transmisión de archivos o la comunicación cliente-servidor.
+* **Comunicación UDP**: La librería ‘socket‘ también admite la comunicación mediante UDP, que es un protocolo de envío de mensajes sin conexión. Es adecuado para aplicaciones que necesitan una comunicación rápida y eficiente, como juegos en línea o aplicaciones de transmisión de video en tiempo real.
+* **Funciones de envío y recepción**: Puedes utilizar métodos como ‘send()‘ y ‘recv()‘ para enviar y recibir datos a través de sockets. Esto te permite transferir información entre dispositivos de manera eficiente.
+* **Gestión de conexiones**: La librería ‘socket‘ incluye métodos como ‘bind()‘ para asociar un socket a una dirección y puerto específicos, y ‘listen()‘ para poner un socket en modo de escucha, lo que le permite aceptar conexiones entrantes.
+* **Conexiones cliente-servidor**: Con ‘socket‘, puedes crear aplicaciones cliente-servidor, donde un programa actúa como servidor esperando conexiones entrantes y otro actúa como cliente para conectarse al servidor.
+
+En resumen, la librería ‘socket‘ en Python proporciona las herramientas necesarias para desarrollar aplicaciones de red, permitiendo la comunicación entre dispositivos a través de diferentes protocolos y ofreciendo control sobre la transferencia de datos.
+Es una parte fundamental de la programación de redes en Python y se utiliza en una amplia variedad de aplicaciones, desde servidores web hasta aplicaciones de chat y juegos en línea.
