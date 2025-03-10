@@ -1,5 +1,11 @@
 # Python Ofensivo
 
+## Secciones del curso
+
+### Temas del curso (Videos)
+
+#### Subtemas de cada uno de los videos
+
 ## Introduccion al curso de python ofensivo
 
 Nos detalla la ruta correcta para llegar a ser pentester, llevando primero el curso de linux, luego el de personalizacion de linux, luego este de python y por ultimo el de introduccion a la ciberseguridad.
@@ -2440,3 +2446,909 @@ Esto incluye desde la manipulación básica de cadenas hasta técnicas más avan
 La codificación de caracteres es un aspecto clave para garantizar que la entrada y salida manejen adecuadamente diferentes idiomas y conjuntos de caracteres, preservando la integridad de los datos y la claridad de la comunicación en la consola.
 
 Dominar estas funciones es crucial para crear programas que requieran interacción con el usuario, y te brindarán las herramientas necesarias para construir aplicaciones interactivas robustas y fáciles de usar.
+
+```python
+while True:
+
+    try:
+        nombre = input("\n[+] dime tu nombre:")
+        edad = int(input("\n[+] dame tu edad: "))
+
+        print(f"tu nombre es {nombre}, el año que viene tendrás {edad + 1}")
+        break
+    except ValueError:
+        print("El tipo esta mal")
+```
+
+```python
+# Libreria getpass, no es una libreria built-in, es descargada con pip,
+# sirve para ocultar las entradas por teclado, añadiendo seguridad
+from getpass import getpass
+
+password = getpass("\n[+] Introduce tu password: ")
+
+print(f"\n[+] Tu contrasña es: {password}")
+```
+
+### Lectura y escritura de archivos
+
+La lectura y escritura de archivos son operaciones fundamentales en la mayoría de los programas, y Python proporciona herramientas sencillas y poderosas para manejar archivos.
+En esta clase, aprenderemos cómo abrir, leer, escribir y cerrar archivos de manera eficiente y segura.
+
+### Manejo básico de archivos
+
+Explicaremos cómo utilizar la función 'open()' para crear un objeto archivo y cómo los modos de apertura ('r' para lectura, 'w' para escritura, 'a' para añadir y 'b' para modo binario) afectan la manera en que trabajamos con esos archivos.
+
+### Lectura de archivos
+
+Detallaremos cómo leer el contenido de un archivo en memoria, ya sea de una sola vez con el método 'read()' o línea por línea con 'readline()' o iterando sobre el objeto archivo.
+
+### Escritura de archivos
+
+Examinaremos cómo escribir en un archivo usando métodos como 'write()' o 'writelines()', y cómo estos métodos difieren en cuanto a su manejo de strings y secuencias de strings.
+
+### Manejadores de contexto
+
+Unos de los aspectos más importantes de la lectura y escritura de archivos en Python es el uso de manejadores de contexto, proporcionados por la declaración 'with'.
+Los manejadores de contexto garantizan que los recurso se manejen correctamente, abriendo el arcivo y asegurándose de que, sin importar cómo o dónde termine el bloque de código, el archivo siempre se cierre adecuadamente.
+Esto ayuda a prevenir errores comunes como fugas de recursos o archivos que no se cierran si ocurre una excepción.
+
+El uso de 'with open()' no solo mejora la legibilidad del código, sino que también simplifica el manejo de excepciones al trabajar con archivos, haciendo el código más seguro y robusto.
+
+```python
+#!/usr/bin/env python3
+import os
+os.system('cls' if os.name == 'nt' else 'clear') # Para limpiar terminal 
+
+# example.txt ("Hola mundo")
+
+# w -> para escribir, no guarda lo que tiene, borra y escribe
+#f = open("example.txt", "w")
+
+# r -> para leer, dando por hecho que ya exite
+#f = open("example.txt", "r")
+
+# a -> append, para añadir datos al final del todo de un archivo
+f = open("example.txt", "a")
+
+f.write("Hasta luego mundo")
+
+f.close()
+
+# Hacer de esta forma porque es más óptimo
+# De esta forma no necesito cerrar el archivo python lo hace
+with open("example.txt", "w") as f:
+    f.write("Hola vicky como estas\n")
+    f.write("Hola ivon como estas\n")
+    f.write("Hola gerardo como estas\n")
+    f.write("Hola salvador como estas\n")
+
+with open("example.txt", "r") as f:
+    file_content = f.read()
+
+print(file_content)
+
+with open("example.txt", "r") as f:
+    for line in f:
+        print(line.strip())
+
+
+mi_lista = ["Primera linea\n", "Segunda linea\n", "tercera linea\n", "cuarta linea\n"]
+
+with open ("example.txt", "w") as f:
+    f.writelines(mi_lista)
+```
+
+### Formateo de cadenas y manipulación de datos
+
+El formateo de cadenas y la manipulación de texto son habilidades esenciales en Python, especialmente en aplicaciones que involucran la presentación de datos al usuario o el procesamiento de información textual.
+En esta clase, nos centraremos en las técnicas y herramientas que Python ofrece para trabajar con cadenas de texto.
+
+#### Formateo de cadenas
+
+Aprenderemos los distintos métodos de formateo de cadenas que Python proporciona, incluyendo:
+
+* **Formateo clásico**: A través del operador %, similar al 'printf' en C.
+* **Método format()**: Un enfoque versátil que ofrece numerosas posibilidades para formatear y alinear texto, rellenar caracteres, trabajar con números y más.
+* **F-strings (Literal String Interpolation)**: Introducido en Python 3.6, este método permite incrustar expresiones dentro de cadenas de teto de una manera concisa y legible.
+
+#### Manipulación de texto
+
+Exploraremos las funciones y métodos incorporados para la manipulación de cadenas, que incluyen:
+
+* **Métodos de búsqueda y reemplazo**: Como 'find()', 'index()', 'replace()' y métodos de expresiones regulares.
+* **Métodos de prueba**: Para verificar el contenido de la cadena, como 'isdigit()', 'isalpha()', 'startwith()', y 'endswith()'.
+* **Métodos de transformación**: Que permiten cambiar el caso de una cadena, dividirla en una lista de subcadenas o unirlas, como 'upper()', 'lower()', 'split()', y 'join()'.
+
+También veremos cómo trabajar con cadenas Unicode en Python, lo que es esencial para aplicaciones modernas que necesitan soportar múltiples idiomas y caracteres especiales.
+
+Al final de esta clase, tendrás una comprensión completa de cómo dar formato a las cadenas para la salida de datos y cómo realizar operaciones comunes de manipulación de texto.
+Estas habilidades son fundamentales para la creación de aplicaciones que necesitan una interfaz de usuario sofisticada y para el procesamiento de datos en aplicaciones backend.
+
+```python
+#!/usr/bin/env python3
+import os
+os.system('cls' if os.name == 'nt' else 'clear') # Para limpiar terminal 
+
+nombre = "Gerardo"
+edad = 26
+
+print("Hola me llamo {} y tengo {}".format(nombre, edad))
+print("Hola me llamo {1} y tnego {0}".format(edad, nombre))
+print(f"Hola me llamo {nombre} y tengo {edad}") # Nos permiten realizar operatorias
+
+cadena = "  Hola mundo!!    "
+print(cadena.strip()) # quita espacios antes y despues del texto
+
+cadena = "hola MUNDO"
+print(cadena.lower())
+
+cadena = "hola MUNDO"
+print(cadena.upper())
+
+cadena = "hola MUNDo"
+print(cadena.replace('o', 'x')) # Donde esta 'o' cambialo por 'x'
+
+cadena = "hola MUNDo"
+nueva_cadena = cadena.split() # Crea una lista tomando en cuenta el delimitador, por default es "espacio"
+print(nueva_cadena)
+
+cadena = "Hola,mundo:test"
+nueva_cadena = cadena.split(":")
+print(nueva_cadena)
+
+s = "Hola mundo!"
+print(s.startswith('Hola'))
+
+s = "Hola mundo!"
+print(s.endswith('!'))
+
+s = "gerardperezsanchez@gmail.com"
+print(s.endswith('@gmail.com'))
+
+s = "gerard@gmail.com"
+print(s.find('@gmail.com'))
+
+s = "gerard@gmail.com"
+print(s.find('@gmail.com'))
+
+#s = "gerard@gmail.com"
+#print(s.index('salvador'))
+
+s = "gerard@gmail.com"
+print(f"Total de veces que sale el caracter e: {s.count('g')} ")
+
+cadena = ["Hola", "mundo", "test"]
+print(' '.join(cadena))
+
+nombres = ["Gerardo", "Salvador", "Ivon"]
+print(f"Los nombres en la lista son: {' '.join(nombres)}")
+
+s = "hola como estas"
+g = "Hola Como Estas"
+print(s.capitalize()) # Mayuscula solo la primera
+print(s.title()) # Mayuscula las primeras despues del espacio
+print(g.swapcase()) # Invierte las mayusculas y minusculas
+
+k = "Testing"
+print(k.isalpha())
+
+k = "Testing123"
+print(k.isalpha())
+
+k = "123"
+print(k.isdigit())
+
+k = " "
+print(k.isspace())
+
+k = "hola mundo"
+print(k.islower())
+
+k = "hola mundo"
+print(k.isupper())
+
+k = "Hola Mundo"
+print(k.istitle())
+
+k = "Hola, soy, Gerardo, y, no, me, gusta,"
+print(k.replace(',','@'))
+
+g = "Hola compañero de trabajo no me toques"
+tabla = str.maketrans('aei','zpo') # transformamos aei hacia zpo respectivamente
+nueva_cadena = s.translate(tabla)
+print(nueva_cadena)
+```
+
+## Proyecto de POO para reforzar lo aprendido
+
+### Proyecto de gestión de biblioteca de libros (1/2)
+
+En este emocionante proyecto inicial, desarrollaremos un sistema de gestión para una biblioteca utilizando Python.
+
+Este sistema nos permitirá agregar nuevos libros a la biblioteca y gestionar el préstamo de estos.
+A través de la creación de este sistema, aplicaremos de manera práctica los fundamentos de la Programación Orientada a Objetos (POO), haciendo especial énfasis en conceptos clave como herencia y polimorfismo.
+Diseñaremos clases para representar diferentes aspectos de una biblioteca, como libros, miembros y transacciones de préstamo.
+
+Con este proyecto, no solo consolidaremos nuestra comprensión de POO, sino que también mejoraremos nuestras habilidades de programación en Python, creando un sistema funcional y útil.
+
+```python
+#!/usr/bin/env python3
+import os
+os.system('cls' if os.name == 'nt' else 'clear') # Para limpiar terminal 
+
+class Libro:
+
+    def __init__(self, id, autor, titulo):
+        self.id = id
+        self.autor = autor
+        self.titulo = titulo
+        self.esta_prestado = False
+
+    def __str__(self):
+        return f"Libro({self.id},{self.autor},{self.esta_prestado})"
+    
+    def __repr__(self):
+        return self.__str__()
+    
+class Biblioteca:
+    
+    def __init__(self):
+        self.libros = {} # {1 : Libro(1, "Gerardo Salvador", "El mundo de sofia")}
+    
+    def agregar_libro(self, libro):
+        if libro.id not in self.libros:
+            self.libros[libro.id] = libro
+        else:
+            print(f"\n[!] No es posible agregar el libro con ID {libro.id_libro}")
+
+    @property
+    def mostrar_libros(self):
+        return [libro for libro in self.libros.values() if not libro.esta_prestado]
+
+if __name__ == '__main__':
+
+    biblioteca = Biblioteca()
+
+    libro1 = Libro(1, "Gerardo Salvador", "El mundo de sofia")
+    libro2 = Libro(2, "Gerardo Python", "Como ser un lammer")
+
+    print(libro1)
+    print(libro2)
+
+
+    biblioteca.agregar_libro(libro1)
+    biblioteca.agregar_libro(libro2)
+
+    print(f"[+] Libros en la biblioteca: {biblioteca.mostrar_libros}")
+```
+
+### Proyecto de gestión de biblioteca de libros (2/2)
+
+En esta clase, continuamos avanzando en nuestro emocionante primer proyecto en Python, el desarrollo de un sistema de gestión de biblioteca.
+Esta fase del proyecto nos permitirá profundizar en las funcionalidades que hemos comenzado a construir.
+Nos enfocaremos en perfeccionar las características existentes y en añadir nuevas funcionalidades.
+
+Al final de esta clase, nuestro objetivo es concluir el proyecto.
+Nos aseguraremos de que todos los conceptos clave de la programación Orientada a Objetos, como la herencia, el polimorfismo y la utilización de clases, estén integrados de manera efectiva.
+Esta clase no solo consolida lo aprendido hasta ahora, sino que también culmina en la finalización de un sistema funcional y bien estructurado.
+
+```python
+#!/usr/bin/env python3
+import os
+os.system('cls' if os.name == 'nt' else 'clear') # Para limpiar terminal 
+
+class Libro:
+
+    def __init__(self, id, autor, titulo):
+        self.id = id
+        self.autor = autor
+        self.titulo = titulo
+        self.esta_prestado = False
+
+    def __str__(self):
+        return f"Libro({self.id},{self.autor}, {self.titulo}, {self.esta_prestado})"
+    
+    def __repr__(self):
+        return self.__str__()
+    
+class Biblioteca:
+    
+    def __init__(self):
+        self.libros = {} # {1 : Libro(1, "Gerardo Salvador", "El mundo de sofia")}
+    
+    def agregar_libro(self, libro):
+        if libro.id not in self.libros:
+            self.libros[libro.id] = libro
+        else:
+            print(f"\n[!] No es posible agregar el libro con ID {libro.id_libro}")
+
+    def prestar_libro(self, id_libro):
+        if id_libro in self.libros and not self.libros[id_libro].esta_prestado:
+            self.libros[id_libro].esta_prestado = True
+        else:
+            print(f"\n[!] No es posible prestar el libro con ID {id_libro}")
+
+    @property
+    def mostrar_libros(self):
+        return [libro for libro in self.libros.values() if not libro.esta_prestado]
+
+    @property
+    def mostrar_libros_prestados(self):
+        return [libro for libro in self.libros.values() if libro.esta_prestado]
+    
+class BibliotecaInfantil(Biblioteca):
+    
+    def __init__(self):
+        super().__init__()
+        self.libros_para_ninos = {} # -> {1:True, 2:False, 3:True}
+
+    def agregar_libro(self, libro, es_para_ninos):
+        super().agregar_libro(libro)
+        self.libros_para_ninos[libro.id] = es_para_ninos
+
+    def prestar_libro(self, id_libro, es_para_ninos):
+        if id_libro in self.libros and self.libros_para_ninos[id_libro] == es_para_ninos and not self.libros[id_libro].esta_prestado:
+            self.libros[id_libro].esta_prestado = True
+        else:
+            print(f"\n[!] No es posible prestar el libro con ID {id_libro}")
+    
+    @property
+    def mostrar_estado_libros_para_ninos(self):
+        return self.libros_para_ninos
+
+if __name__ == '__main__':
+
+    biblioteca = BibliotecaInfantil()
+
+    libro1 = Libro(1, "Gerardo Salvador", "El mundo de sofia")
+    libro2 = Libro(2, "Gerardo Python", "Como ser un lammer")
+    libro3 = Libro(3, "Gerardo", "Aprende a colorear desde cero")
+
+    biblioteca.agregar_libro(libro1, es_para_ninos=False)
+    biblioteca.agregar_libro(libro2, es_para_ninos=False)
+    biblioteca.agregar_libro(libro3, es_para_ninos=True)
+
+    print(f"\n[+] Libros en la biblioteca: {biblioteca.mostrar_libros}")
+
+    biblioteca.prestar_libro(1, es_para_ninos = False)
+
+    biblioteca.prestar_libro(1, es_para_ninos=True)
+
+    print(f"\n[+] Libros en la biblioteca: {biblioteca.mostrar_libros}")
+
+    print(f"\n[+] Libros prestados: {biblioteca.mostrar_libros_prestados}")
+
+    print(f"\n[+] Libros para niños: {biblioteca.mostrar_estado_libros_para_ninos}")
+```
+
+### Proyecto de gestión de animales en tienda
+
+En este proyecto, continuamos explorando la Programación Orientada a Objetos (POO), esta vez con un enfoque diferente.
+Sin emplear herencia ni polimorfismo, nos centraremos en la creación de un sistema de gestión de animales en una tienda.
+
+El proyecto involucrará el diseño y la implementación de dos clases principales que trabajarán de manera sinérgica.
+Estas clases nos permitirán realizar una variedad de operaciones esenciales en la gestión de una tienda de animales.
+Entre las funcionalidades que desarrollaremos, se incluyen métodos para agregar nuevos animales al inventario, mostrar los animales disponibles, alimentar a los animales y gestionar su venta.
+
+A través de este proyecto, no solo afianzaremos nuestras habilidades en POO, sino que también demostraremos cómo diferentes clases pueden colaborar de forma efectiva para lograr objetivos comunes.
+Este sistema nos dará una perspectiva práctica y realista sobre cómo la POO puede ser utilizada para resolver problemas y gestionar información en un contexto de negocios.
+
+```python
+#!/usr/bin/env python3
+import os
+os.system('cls' if os.name == 'nt' else 'clear') # Para limpiar terminal 
+
+class Animal:
+    
+    def __init__(self, nombre, especie):
+        self.nombre = nombre
+        self.especie = especie
+        self.alimentado = False
+
+    def alimentar(self):
+        self.alimentado = True
+
+    def vender(self):
+        self.alimentado = False
+
+    def __str__(self):
+        return f"{self.nombre} ({self.especie}) - {'Alimentado' if self.alimentado else 'Hambiento'}"
+
+class TiendaAnimales:
+    def __init__(self, nombre):
+        self.nombre = nombre
+        self.animales = []
+
+    def agregar_animal(self, animal):
+        self.animales.append(animal)
+
+    def mostrar_animales(self):
+        for animal in self.animales:
+            print(animal)
+
+    def alimentar_animales(self):
+        for animal in self.animales:
+            animal.alimentar()
+
+    def vender_animal(self, nombre):
+        for animal in self.animales:
+            if animal.nombre == nombre:
+                animal.vender()
+                self.animales.remove(animal)
+                return
+        print(f"[!] No se ha encontrado ningun animal en la tienda con nombre {nombre}")
+
+
+
+if __name__ == '__main__':
+
+    tienda = TiendaAnimales("Vicky Zoo")
+
+    gato = Animal("Kitty", "Gato")
+    perro = Animal("Lobo", "Perro")
+
+    tienda.agregar_animal(gato)
+    tienda.agregar_animal(perro)
+
+    tienda.mostrar_animales()
+    tienda.alimentar_animales()
+
+    print("[+] Alimentando animales")
+    tienda.mostrar_animales()
+
+    tienda.vender_animal("Lobo")
+    print(f"\n[+] Mostrando los animales una ves Lobo ha sido vendido")
+
+    tienda.mostrar_animales()
+
+```
+
+### Proyecto de administración de flota de vehiculos
+
+En este proyecto de Python, nos embarcamos en el desafío de crear un sistema de administración para una flota de vehículos, aplicando nuevamente los principios de la Programación Orientada a Objetos.
+Este proyecto se centrará en el diseño y la implementación de dos clases interactivas, que trabajarán en conjunto para gestionar eficientemente una flota de vehículos.
+
+Dentro de las capacidades de nuestro sistema, incluiremos métodos para agregar nuevos vehículos a la flota, lo que nos permitirá expandir y diversificar nuestras opciones de alquiler.
+Además, desarrollaremos funcionalidades para el alquiler de vehículos, brindando a los clientes la posibilidad de elegir entre diferentes tipos de vehículos según sus necesidades.
+
+Otra característica clave será la gestión de la devolución de vehículos.
+Este método facilitará el proceso de retorno de los vehículos alquilados, asegurando un control eficiente y organizado de la flota.
+
+Este proyecto no solo fortalecerá nuestra comprensión y habilidad en POO, sino que también nos proporcionará valiosas lecciones sobre cómo las clases pueden interactuar para administrar operaciones complejas en un entorno empresarial real.
+
+```python
+#!/usr/bin/env python3
+import os
+os.system('cls' if os.name == 'nt' else 'clear') # Para limpiar terminal 
+
+class Vehiculo:
+    def __init__(self, matricula, modelo):
+        self.matricula = matricula
+        self.modelo = modelo
+        self.disponible = True
+
+    def alquilar(self):
+        if self.disponible:
+            self.disponible = False
+        else:
+            print(f"[!] El vehiculo con mátricula {self.matricula} no se puede alquilar")
+
+    def devolver(self):
+        if not self.disponible:
+            self.disponible = True
+        else:
+            print(f"[!] El vehiculo no se puede devolver porque no se ha alquilado")
+
+    def __str__(self): 
+        return f"Vehiculo(matricula={self.matricula}, modelo={self.modelo}, disponible={self.disponible})" # Vehiculo(matricula=X, modelo=Y, disponible=True/False)
+
+
+
+class Flota:
+    def __init__(self):
+        self.vehiculos = []
+
+    def agregar_vehiculo(self, vehiculo):
+        self.vehiculos.append(vehiculo)
+
+    def alquilar_vehiculos(self, matricula):
+        for vehiculo in self.vehiculos:
+            if vehiculo.matricula == matricula:
+                vehiculo.alquilar()
+
+    def devolver_vehiculo(self, matricula):
+        for vehiculo in self.vehiculos:
+            if vehiculo.matricula == matricula:
+                vehiculo.devolver()
+
+    def __str__(self):
+        return "\n".join(str(vehiculo) for vehiculo in self.vehiculos)
+
+if __name__ == '__main__':
+
+    flota = Flota()
+
+    flota.agregar_vehiculo(Vehiculo("CRM321","Hilux"))
+    flota.agregar_vehiculo(Vehiculo("FFIXXX","Mazda Mx"))
+    flota.agregar_vehiculo(Vehiculo("ADRRSQW","Xiaomi"))
+
+    print("\n[+] Flota inicial:")
+    print(flota)
+
+    flota.alquilar_vehiculos("FFIXXX")
+
+    print("\n[+] Flota:")
+    print(flota)
+
+    flota.devolver_vehiculo("FFIXXX")
+
+    print("\n[+] Flota:")
+    print(flota)
+
+    flota.devolver_vehiculo("FFIXXX")
+
+    print("\n[+] Flota:")
+    print(flota)
+```
+
+### Proyecto de gestión de notas (1/2)
+
+En este nuevo proyecto de Python, nos embarcamos en la construcción de un gestor de notas avanzado, aprovechando las técnicas de la Programación Orientada a Objetos (POO).
+Nuestro objetivo es crear un sistema interactivo que nos permita manejar eficientemente una variedad de notas.
+
+El corazón de nuestro proyecto será un menú interactivo desde el cual podremos realizar múltiples acciones.
+Entre estas, incluiremos la capacidad de crear nuevas notas que serán almacenadas en disco, visualizar todas las notas existentes, buscar notas específicas por ciertos criterios y eliminar notas que ya no sean necesarias.
+
+Para lograr esto, definiremos varias clases y métodos que colaborarán para manejar las diferentes operaciones relacionadas con las notas.
+Una parte crucial de nuestro proyecto será la implementación de módulos múltiples, lo que nos permitirá organizar mejor nuestro código y hacerlo más mantenible.
+
+Además, exploraremos los conceptos de serialización y deserialización de datos utilizando Pickle.
+Esto nos permitirá guardar y recuperar eficientemente el estado de nuestras notas desde y hacia el disco, facilitando la persistencia de los datos a través de las sesiones de uso del gestor.
+
+Este proyecto no solo fortalecerá nuestras habilidades en POO y manejo de datos, sino que también nos proporcionará experiencia práctica en la creación de aplicaciones Python que interactúan con el sistema de archivos y gestionan la información de manera eficiente.
+
+---
+
+Codigo: **main.py**
+
+```python
+#!/usr/bin/env python3
+import os, pickle
+from gestor_notas import GestorNotas
+
+# Sistema de gestion de notas, craer nota en un archivo, leer nota con menu, 
+# Serializacion y deserializacion pickle
+
+def main():
+
+    gestor = GestorNotas()
+
+    while True:
+
+        print(f"\n-------------\nMENU\n-------------")
+        print("1. Agregar una nota")
+        print("2. Leer todas las notas")
+        print("3. Buscar por una nota")
+        print("4. Eliminar una nota")
+        print("5. Salir")
+
+        opcion = input("\n[+] Escoge una opción: ")
+
+        if opcion == "1":
+            contenido = input("\n[+] Contenido de la nota: ")
+            gestor.agregar_nota(contenido)
+
+        elif opcion == "5":
+            break
+
+        else:
+            print("\n[!] La opción indicada es incorrecta\n")
+
+        input(f"\n[+] Presiona <Enter> para continuar...")
+        os.system('cls' if os.name == 'nt' else 'clear')
+
+if __name__ == '__main__':
+    main()
+```
+
+---
+
+Codigo: **gestor_notas.py**
+
+```python
+#!/usr/bin/env python3
+import pickle
+from notas import Nota
+
+class GestorNotas:
+    def __init__(self, archivos_notas='notas.pkl'):
+        self.archivos_notas = archivos_notas
+
+        try:
+            with open(self.archivos_notas, 'rb') as f:
+                self.notas = pickle.load(f)
+
+        except FileNotFoundError:
+            self.notas = []
+
+    def guardar_notas(self):
+        with open(self.archivos_notas, 'wb') as f:
+            pickle.dump(self.notas, f)
+
+    def agregar_nota(self, contenido):
+        self.notas.append(Nota(contenido))
+        self.guardar_notas()
+```
+
+---
+
+Codigo: **notas.py**
+
+```python
+#!/usr/bin/env python3
+
+class Nota:
+
+    def __init__(self, contenido):
+        self.contenido = contenido
+
+```
+
+### Proyecto de gestión de notas (2/2)
+
+En esta clase, concluiremos nuestro proyecto de gestor de notas en Python utilizando Pickle.
+Tras haber sentado las bases en nuestra sesión anterior, ahora es momento de integrar y finalizar todos los componentes de nuestro sistema.
+Vamos a dedicar esta clase a revisar y perfeccionar las clases principales, asegurándonos de que todas las funcionalidades clave, como crear, visualizar, buscar y eliminar notas, funcionen de manera fluida.
+
+Un enfoque importante será la implementación efectiva de la serialización y deserialización con Pickle.
+Esta técnica es crucial para la persistencia de las notas en el disco, permitiendo que se guarden de forma segura y se recuperen en futuras sesiones del programa.
+
+Al concluir esta clase, habremos completado un gestor de notas funcional y eficiente.
+Este proyecto no solo refuerza nuestras habilidades en programación orientada a objetos y manejo de datos, sino que también nos proporciona experiencia práctica en la creación de aplicaciones Python interactivas y robustas.
+
+---
+
+Codigo: **main.py**
+
+```python
+#!/usr/bin/env python3
+import os, pickle
+from gestor_notas import GestorNotas
+
+# Sistema de gestion de notas, craer nota en un archivo, leer nota con menu, 
+# Serializacion y deserializacion pickle
+
+def main():
+
+    gestor = GestorNotas()
+
+    while True:
+
+        print(f"\n-------------\nMENU\n-------------")
+        print("1. Agregar una nota")
+        print("2. Leer todas las notas")
+        print("3. Buscar por una nota")
+        print("4. Eliminar una nota")
+        print("5. Salir")
+
+        opcion = input("\n[+] Escoge una opción: ")
+
+        if opcion == "1":
+            contenido = input("\n[+] Contenido de la nota: ")
+            gestor.agregar_nota(contenido)
+
+        elif opcion == "2":
+            notas = gestor.leer_notas()
+
+            print("\n[+] Mostrando todas las notas almacenadas: \n")
+
+            for i, nota in enumerate(notas):
+                print(f"{i}: {nota}")
+
+        elif opcion == "3":
+            texto_busqueda = input("\n[+] Ingresa el texto a buscar como criterio en las notas: ")
+
+            notas = gestor.buscar_nota(texto_busqueda)
+
+            print(f"\n[+] Mostrando las notas que coinciden con el criterio de busqueda:\n")
+            
+            for i, nota in enumerate(notas):
+                print(f"{i}: {nota}")
+        elif opcion == "4":
+            index = int(input("\n[+] Introduce el indice de la nota que quieres borrar:\n"))
+            gestor.eliminar_nota(index)
+        elif opcion == "5":
+            break
+
+        else:
+            print("\n[!] La opción indicada es incorrecta\n")
+
+        input(f"\n[+] Presiona <Enter> para continuar...")
+        os.system('cls' if os.name == 'nt' else 'clear')
+
+if __name__ == '__main__':
+    main()
+```
+
+---
+
+Codigo: **gestor_notas.py**
+
+```python
+#!/usr/bin/env python3
+import pickle
+from notas import Nota
+
+class GestorNotas:
+    def __init__(self, archivos_notas='notas.pkl'):
+        self.archivos_notas = archivos_notas
+
+        try:
+            with open(self.archivos_notas, 'rb') as f:
+                self.notas = pickle.load(f)
+
+        except FileNotFoundError:
+            self.notas = []
+
+    def guardar_notas(self):
+        with open(self.archivos_notas, 'wb') as f:
+            pickle.dump(self.notas, f)
+
+    def agregar_nota(self, contenido):
+        self.notas.append(Nota(contenido))
+        self.guardar_notas()
+
+    def leer_notas(self):
+        return self.notas
+    
+    def buscar_nota(self, texto_busqueda):
+        return [nota for nota in self.notas if nota.coincide(texto_busqueda)]
+    
+    def eliminar_nota(self, index):
+        if index < len(self.notas):
+            del self.notas[index]
+            self.guardar_notas()
+        else:
+            print(f"\n[!] El índice proporcionado es incorrecto\n")
+        
+```
+
+---
+
+Codigo: **notas.py**
+
+```python
+#!/usr/bin/env python3
+
+class Nota:
+
+    def __init__(self, contenido):
+        self.contenido = contenido
+
+    def coincide(self, texto_busqueda):
+        return texto_busqueda in self.contenido
+
+
+    def __str__(self):
+        return self.contenido
+```
+
+## Biblioteca estándar y herramientas adicionales
+
+### Manejo de fechas y horas
+
+La biblioteca 'datetime' en Python es una de las principales herramientas para trabajar con fechas y horas.
+Aquí hay algunos aspectos clave sobre esta biblioteca:
+
+* **Tipos de datos principales**: 'datetime' incluye varios tipos de datos, como 'date' (para fechas), 'time'(para horas), 'datetime'(para fechas y horas combinadas), y 'timedelta'(para representar diferencias de tiempo).
+* **Manipulación de fechas y horas**: Permite realizar operaciones como sumar o restar días, semanas, o meses a una fecha, comparar fechas, o extraer componentes como el día, mes, o año de una fecha específica.
+* **Zonas horarias**: A través del módulo 'pytz' que se integra con 'datetime', se pueden manejar fechas y horas en diferentes zonas horarias, lo que es crucial para aplicaciones que requieren precisión a nivel global.
+* **Formateo y análisis**: 'datetime' permite convertir fechas y horas a strings y viceversa, utilizando códigos de formato específicos. Esto es útil para mostrar fechas y horas en formatos legibles o para parsear strings que representan fechas/horas.
+* **Facilidad de uso**: A pesar de su potencia y flexibilidad, datetime es relativamente fácil de usar, lo que la hace accesible incluso para programadores principiantes.
+* **Amplia aplicación**: Desde registros de eventos hasta cálculos de períodos de tiempo, datetime es indispensable en una variedad de aplicaciones, como sistemas de reservas, análisis de datos temporales, y más.
+
+En resumen, datetime es una biblioteca integral y robusta para el manejo de fechas y horas en Python, ofreciendo una amplia gama de funcionalidades esenciales para el manejo de datos temporales en la programación.
+
+```python
+#!/usr/bin/env python3
+
+import datetime
+
+fecha = datetime.date(2023, 5, 13)
+hora = datetime.time(14,15,15)
+fecha_hora = datetime.datetime(2023, 5, 12, 14, 15, 16)
+
+ahora = datetime.datetime.now()
+año = ahora.year
+mes = ahora.month
+dia = ahora.day
+hora = ahora.hour
+minuto = ahora.minute
+segundo = ahora.second
+
+print(fecha)
+print(hora)
+print(fecha_hora)
+
+print(ahora)
+print(año)
+print(mes)
+print(dia)
+print(hora)
+print(minuto)
+print(segundo)
+```
+
+### Expresiones regulares
+
+La librería 're' en Python proporciona un conjunto completo de herramientas para trabajar con expresiones regulares, que son patrones de cadenas diseñados para la búsqueda y manipulación de texto.
+
+Aquí hay varios aspectos importantes de esta librería:
+
+* **Funciones básicas**: 're' incluye funciones como 'search' (para buscar un patrón dentro de una cadena), 'match' (para verificar si una cadena comienza con un patrón específico), 'findall' (para encontrar todas las ocurrencias de un patrón), y 'sub' (para reemplazar partes de una cadena que coinciden con un patrón).
+* **Compilación de patrones**: Permite compilar expresiones regulares en objetos de patrón, lo que puede mejorar el rendimiento cuando se usan repetidamente.
+* **Grupos y captura**: Ofrece la capacidad de definir grupos dentro de patrones de expresiones regulares, lo que facilita extraer partes específicas de una cadena que coinciden con subpatrones.
+* **flags**: Soporta modificadores que alteran la forma en que las expresiones regulares son interpretadas y coincididas, como ignorar y mayúsculas y minúsculas o permitir el modo multilínea.
+* **Patrones complejos**: Permite la creación de patrones complejos utilizando una variedad de símbolos y secuencias especiales, como cuantificadores, aserciones y clases de caracteres.
+* **Aplicaciones prácticas**: Las expresiones regulares son extremadamente útiles en tareas como la validación de formatos (por ejemplo, direcciones de correo electrónicos), el análisis de registros(logs), el procesamiento de lenguaje natural, y la limpieza y preparación de datos.
+* **Curva de aprendizaje**: Aunque potentes, las expresiones regulares pueden ser complejas y requieren una curva de aprendizaje. Sin embargo, una vez dominadas, se convierten en una herramienta invaluable en el arsenal de cualquier programador.
+
+En resumen, la librería 're' en Python es una herramienta esencial para cualquier tarea que implique procesamiento complejo de cadenas de texto, proporcionando una forma poderosa y flexible de buscar, analizar, y manipular datos basados en texto.
+
+```python
+#!/usr/bin/env python3
+import os, re
+os.system('cls' if os.name == 'nt' else 'clear') # Para limpiar terminal 
+
+
+texto = "Mi gato está en el tejado y mi otro gato está en el jardin"
+texto_1 = "Hoy estamos a fecha 10/10/2025, mañana estaremos a 11/10/2025"
+texto_2 = "Los usuarios pueden contactarnos a soporte@hack.io o a sistemas@hack.io"
+texto_3 = "Mi gato está en el tejado y mi perro está en el jardin"
+texto_4 = "Campo1, Campo2, Campo3, Campo4, Campo5, Campo6"
+
+texto = re.findall("gato", texto)
+texto_1 = re.findall("\d{2}\/\d{2}\/\d{4}", texto_1)
+texto_2 = re.findall("(\w+)@(\w+\.\w{2,})", texto_2)
+texto_3 = re.sub("gato", "perro", texto_3)
+texto_4 = re.split(",", texto_4)
+
+print(texto)
+print(texto_1)
+print(texto_2)
+print(texto_3)
+print(texto_4)
+print(texto_4[1])
+
+# Validador de un correo electrónico
+
+def validar_correo(correo):
+    
+    patron = "[A-Za-z0-9._+-]+@[A-Za-z0-9]+\.[A-Za-z]{2,}"
+
+    if re.findall(patron, correo):
+        return True
+    else:
+        return False
+
+print(validar_correo("soporte@hack4u.io"))
+
+################################################################
+
+patrones = "car, carro, cart, masticar, magicarp"
+
+print(re.findall("car", patrones))
+print(re.findall(r"\bcar", patrones))
+print(re.findall(r"car\b", patrones))
+print(re.findall(r"\bcar\b", patrones))
+
+################################################################
+
+texto_5 = "Hoy estamos a dia 10/10/2023 mañana será 11/10/2023"
+patron = r"\b(\d{2}\/\d{2}\/\d{4})\b"
+print(re.findall(patron, texto_5))
+
+for match in re.finditer(patron, texto_5):
+    print(f"La fecha es: {match.group(0)}, la cual comienza en la posicion {match.start()} y termina en la posicion {match.end()}")
+```
