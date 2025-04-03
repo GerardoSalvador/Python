@@ -3458,3 +3458,1937 @@ Aquí tienes una visión general de la librería ‘socket‘:
 
 En resumen, la librería ‘socket‘ en Python proporciona las herramientas necesarias para desarrollar aplicaciones de red, permitiendo la comunicación entre dispositivos a través de diferentes protocolos y ofreciendo control sobre la transferencia de datos.
 Es una parte fundamental de la programación de redes en Python y se utiliza en una amplia variedad de aplicaciones, desde servidores web hasta aplicaciones de chat y juegos en línea.
+
+---
+
+Codigo: **server.py**
+
+```python
+#!/usr/bin/env python3
+import os, socket
+os.system('cls' if os.name == 'nt' else 'clear') # Para limpiar terminal 
+
+# af inet = ipv4, sock stream = tcp
+server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server_address = ('localhost', 1234)
+server_socket.bind(server_address)
+
+# Limitar el límite de conexiones
+server_socket.listen(1)
+
+while True:
+
+    client_socket, client_address =  server_socket.accept()
+    data = client_socket.recv(1024)
+    
+    print(f"\n[+] Mensaje recibido del cliente: {data.decode()}")
+    print(f"\n[+] Información del cliente que se ha comunicado con nosotros: {client_address}")
+
+    client_socket.sendall(f"Un saludo crack\n".encode())
+    client_socket.close()
+```
+
+---
+
+Codigo: **client.py**
+
+```python
+#!/usr/bin/env python3
+import os, socket
+os.system('cls' if os.name == 'nt' else 'clear') # Para limpiar terminal 
+
+client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server_address = ('localhost', 1234)
+client_socket.connect(server_address)
+
+try:
+    message = b"Este es un mensaje de prueba que estoy enviando al servidor"
+    client_socket.sendall(message)
+    data = client_socket.recv(1024)
+
+    print(f"[+] El servidor nos  ha respondido con este mensaje: {data.decode()}")
+finally:
+    client_socket.close()
+```
+
+### Conexiones de red y protocolos (2/4)
+
+#### Manejadores de contexto con conexiones
+
+Los manejadores de contexto (‘with‘ en Python) se utilizan para garantizar que los recursos se gestionen de manera adecuada.
+En el contexto de las conexiones de socket, un manejador de contexto se encarga de abrir y cerrar el socket de manera segura.
+Esto evita que los recursos del sistema se queden en uso indefinidamente y asegura una gestión adecuada de las conexiones.
+
+#### Diferencias entre send y sendall
+
+* **send(data)**: El método ‘send()‘ se utiliza para enviar una cantidad específica de datos a través del socket. Puede no enviar todos los datos en una sola llamada y puede ser necesario llamarlo múltiples veces para enviar todos los datos.
+* **sendall(data)**: El método ‘sendall()‘ se utiliza para enviar todos los datos especificados a través del socket. Realiza llamadas repetidas a ‘send()‘ internamente para garantizar que todos los datos se envíen por completo sin pérdidas.
+
+La elección entre ‘send‘ y ‘sendall‘ depende de si se necesita garantizar la entrega completa de los datos o si se permite que los datos se envíen en fragmentos. send puede enviar datos en fragmentos, mientras que sendall garantiza que todos los datos se envíen sin pérdida.
+
+---
+
+Codigo: **server2.py**
+
+```python
+#!/usr/bin/env python3
+import os, socket
+os.system('cls' if os.name == 'nt' else 'clear') # Para limpiar terminal 
+
+def start_server():
+    host = 'localhost'
+    port = 1234
+
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.bind((host, port))
+        print(f"\n[+] Servidor en escucha en {host}:{port}")
+        s.listen(1)
+        conn, addr = s.accept()
+
+        with conn:
+            print(f"\n[+] Se ha conectado un nuevo cliente: {addr}")
+            while True:
+                data = conn.recv(1024)
+                if not data:
+                    break
+                conn.sendall(data)
+
+start_server()
+```
+
+---
+
+Codigo: **client2.py**
+
+```python
+#!/usr/bin/env python3
+import os, socket
+os.system('cls' if os.name == 'nt' else 'clear') # Para limpiar terminal 
+
+def start_client():
+    host = 'localhost'
+    port = 1234
+
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.connect((host, port))
+        s.sendall(b"Hola, servidor!")
+        data = s.recv(1024)
+
+    print(f"[+] Mensaje recibido del servidor: {data.decode()}")
+
+
+start_client()
+```
+
+---
+
+Codigo: **server3.py**
+
+```python
+#!/usr/bin/env python3
+import os, socket
+os.system('cls' if os.name == 'nt' else 'clear') # Para limpiar terminal 
+
+def start_udp_server():
+    
+    host = 'localhost'
+    port = 1234
+
+    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+        s.bind((host, port))
+        print(f"\n[+] Servidor UDP iniciado en {host}:{port}")
+
+        while True:
+            data, addr = s.recvfrom(1024)
+            print(f"\n[+] Mensaje enviado por el cliente: {data.decode()}")
+            print(f"\n[+] Información del cliente que nos ha enviado el mensaje: {addr}")
+
+start_udp_server()
+```
+
+---
+
+Codigo: **client3.py**
+
+```python
+#!/usr/bin/env python3
+import os, socket
+os.system('cls' if os.name == 'nt' else 'clear') # Para limpiar terminal 
+
+def start_udp_client():
+    host = 'localhost'
+    port = 1234
+    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+        message = "Hola, aquí estamos tensandola".encode("utf-8")
+        s.sendto(message, (host, port))
+start_udp_client()
+```
+
+### Conexiones de red y protocolos (3/4)
+
+La función ‘setsockopt‘ en la programación de redes juega un papel crucial al permitir a los desarrolladores ajustar y controlar varios aspectos de los sockets.
+Los sockets son fundamentales en la comunicación de red, proporcionando un punto final para el envío y recepción de datos en una red.
+
+#### Niveles en setsockopt
+
+Cuando utilizas ‘setsockopt’, puedes especificar diferentes niveles de configuración, que determinan el ámbito y la aplicación de las opciones que estableces:
+
+* **Nivel de Socket (SOL_SOCKET)**: Este nivel afecta a las opciones aplicables a todos los tipos de sockets, independientemente del protocolo que estén utilizando. Las opciones en este nivel controlan aspectos generales del comportamiento del socket, como el tiempo de espera, el tamaño del buffer, y el reuso de direcciones y puertos.
+* **Nivel de Protocolo**: Este nivel permite configurar opciones específicas para un protocolo de red en particular, como TCP o UDP. Por ejemplo, puedes ajustar opciones relacionadas con la calidad del servicio, la forma en que se manejan los paquetes de datos, o características específicas de un protocolo.
+
+#### socket.SOL_SOCKET
+
+‘socket.SOL_SOCKET‘ es una constante en muchos lenguajes de programación que se usa con ‘setsockopt’ para indicar que las opciones que se van a ajustar son a nivel de socket.
+Esto significa que las opciones aplicadas en este nivel afectarán a todas las operaciones de red realizadas a través del socket, sin importar el protocolo de transporte específico (como TCP o UDP) que esté utilizando.
+
+#### socket.SO_REUSEADDR
+
+‘socket.SO_REUSEADDR‘ es otra opción comúnmente utilizada en setsockopt. Esta opción es muy útil en el desarrollo de aplicaciones de red. Lo que hace es permitir que un socket se enlace a un puerto que todavía está siendo utilizado por un socket que ya no está activo.
+Esto es particularmente útil en situaciones donde un servidor se reinicia y sus sockets aún están en un estado de “espera de cierre” (TIME_WAIT), lo que podría impedir que el servidor se vuelva a enlazar al mismo puerto.
+
+Al establecer ‘SO_REUSEADDR‘, el sistema operativo permite reutilizar el puerto inmediatamente, lo que facilita la reanudación rápida de los servicios del servidor.
+
+En resumen, ‘setsockopt‘ con diferentes niveles y opciones, como ‘SOL_SOCKET‘ y ‘SO_REUSEADDR‘, proporciona una flexibilidad significativa en la configuración de sockets para una comunicación de red eficiente y efectiva.
+
+### Conexiones de red y protocolos (4/4)
+
+El uso de hilos con ‘threading‘ en Python es crucial para gestionar múltiples clientes en aplicaciones de red que utilizan sockets, especialmente en servidores.
+
+Aquí te explico en detalle por qué es necesario:
+
+* **Concurrencia y Manejo de Múltiples Conexiones**: Los servidores de red a menudo necesitan manejar múltiples conexiones de clientes simultáneamente. Sin hilos, un servidor tendría que atender a un cliente a la vez, lo cual es ineficiente y no escalable. Con ‘threading‘, cada cliente puede ser manejado en un hilo separado, permitiendo al servidor atender múltiples solicitudes al mismo tiempo.
+* **Bloqueo de Operaciones de Red**: Las operaciones de red, como ‘recv‘ y ‘accept‘, suelen ser bloqueantes. Esto significa que el servidor se detendrá en estas operaciones hasta que se reciba algo de la red. Si un cliente se demora en enviar datos, esto puede bloquear todo el servidor, impidiendo que atienda a otros clientes. Con hilos, cada cliente tiene su propio hilo de ejecución, por lo que la lentitud o el bloqueo de uno no afecta a los demás.
+* **Escalabilidad**: Los hilos permiten a los desarrolladores crear servidores que escalan bien con el número de clientes. Al asignar un hilo a cada cliente, el servidor puede manejar muchos clientes a la vez, ya que cada hilo ocupa relativamente pocos recursos del sistema.
+* **Simplicidad en el Diseño de la Aplicación**: Aunque existen modelos alternativos para manejar la concurrencia (como la programación asíncrona), el uso de hilos puede simplificar el diseño y la lógica de la aplicación. Cada hilo puede ser diseñado como si estuviera manejando solo un cliente, lo que facilita la programación y el mantenimiento del código.
+* **Uso Eficiente de Recursos de CPU en Sistemas Multi-Core**: Los hilos pueden ejecutarse en paralelo en diferentes núcleos de un procesador multi-core, lo que permite a un servidor aprovechar mejor el hardware moderno y manejar más eficientemente varias conexiones al mismo tiempo.
+* **Independencia y Aislamiento de Clientes**: Cada hilo opera de manera independiente, lo que significa que un problema en un hilo (como un error o una excepción) no necesariamente afectará a los demás. Esto proporciona un aislamiento efectivo entre las conexiones de los clientes, mejorando la robustez del servidor.
+
+En resumen, el uso de ‘threading‘ para manejar múltiples clientes en aplicaciones basadas en sockets es esencial para lograr una alta concurrencia, escalabilidad y un diseño eficiente que aproveche al máximo los recursos del sistema y proporcione un servicio fluido y estable a múltiples clientes simultáneamente.
+
+---
+
+* **sever4.py**
+
+```python
+#!/usr/bin/env python3
+
+import socket, threading, pdb
+
+class ClientThread(threading.Thread):
+
+    def __init__(self, client_sock, client_addr):
+        super().__init__()
+        self.client_sock = client_sock
+        self.client_addr = client_addr
+
+        print(f"\n[+] Nuevo cliente conectado: {client_addr}")
+
+    def run(self):
+
+        message = ''
+
+        while True:
+            data = self.client_sock.recv(1024)
+            message = data.decode()
+
+            if message.strip() == 'bye':
+                break
+
+            print(f"\n[+] Mensaje enviado por el cliente: {message.strip()}")
+            self.client_sock.send(data)
+
+        print(f"[+] Cliente {client_addr} desconectado")
+
+        self.client_sock.close()
+
+
+HOST = 'localhost'
+PORT = 1234
+
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
+    server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) # TIME_WAIT 
+    server_socket.bind((HOST, PORT))
+
+    print(f"\n[+] En espera de conexiones entrantes...")
+
+    while True:
+
+        server_socket.listen()
+        client_sock, client_addr = server_socket.accept()
+
+        new_thread = ClientThread(client_sock, client_addr)
+        new_thread.start() # run()
+
+
+```
+
+---
+
+* **clien4.py**
+
+```python
+#!/usr/bin/env python3
+
+import socket
+
+def start_client():
+
+    host = 'localhost'
+    port = 1234
+
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.connect((host, port))
+
+        while True:
+            message = input("\n[+] Introduce tu mensaje: ")
+            s.sendall(message.encode())
+
+            if message == 'bye':
+                break
+            data = s.recv(1024)
+            print(f"\n[+] Mensaje de respuesta del servidor: {data.decode()}")
+
+start_client()
+```
+
+---
+
+Codigo: **server5.py**
+
+```python
+#!/usr/bin/env python3
+
+import socket
+
+def start_chat_server():
+    host = 'localhost'
+    port = 1234
+
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) # TIME_WAIT
+    server_socket.bind((host,port))
+    server_socket.listen(1)
+
+    print(f"\n[+] Listo para tensarla con una conexión...")
+    connection, client_addr = server_socket.accept()
+    print(f"\n[+] Se ha conectado el cliente {client_addr}")
+
+    while True:
+        client_message = connection.recv(1024).strip().decode()
+        print(f"\n[+] Mensaje del cliente: {client_message}")
+
+        if client_message == 'bye':
+            break
+
+        server_message = input(f"\n[+] Mensaje para enviar al cliente: ")
+        connection.send(server_message.encode())
+
+    connection.close()
+
+start_chat_server()
+```
+
+---
+
+Codigo: **client5.py**
+
+```python
+#!/usr/bin/env python3
+
+import socket
+
+def start_chat_client():
+
+    host = 'localhost'
+    port = 1234
+
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client_socket.connect((host, port))
+
+    while True:
+        client_message = input(f"\n[+] Mensaje para enviar al servidor: ")
+        client_socket.send(client_message.encode())
+
+        if client_message == 'bye':
+            break
+
+        server_message = client_socket.recv(1024).strip().decode()
+        print(f"\n[+] Mensaje del servidor: {server_message}")
+    
+    client_socket.close()
+
+start_chat_client()
+```
+
+## Manejo de líbrerias comunes
+
+### Librerías os y sys
+
+Las bibliotecas ‘os‘ y ‘sys‘ de Python son herramientas esenciales para cualquier desarrollador que busque interactuar eficazmente con el sistema operativo y gestionar el entorno de ejecución de sus programas.
+Estas bibliotecas proporcionan una amplia gama de funcionalidades que permiten una mayor flexibilidad y control en el desarrollo de software.
+
+#### Biblioteca os
+
+La biblioteca ‘os‘ en Python es una herramienta poderosa para interactuar con el sistema operativo. Proporciona una interfaz portátil para usar funcionalidades dependientes del sistema operativo, lo que significa que los programas pueden funcionar en diferentes sistemas operativos sin cambios significativos en el código.
+Algunas de sus capacidades incluyen:
+
+* **Manipulación de Archivos y Directorios**: Permite realizar operaciones como crear, eliminar, mover archivos y directorios, y consultar sus propiedades.
+* **Ejecución de Comandos del Sistema**: Facilita la ejecución de comandos del sistema operativo desde un programa Python.
+* **Gestión de Variables de Entorno**: Ofrece funciones para leer y modificar las variables de entorno del sistema.
+* **Obtención de Información del Sistema**: Proporciona métodos para obtener información relevante sobre el sistema operativo, como la estructura de directorios, detalles del usuario, procesos, etc.
+
+#### Biblioteca sys
+
+La biblioteca ‘sys‘ es fundamental para interactuar con el entorno de ejecución del programa Python. A diferencia de ‘os‘, que se centra en el sistema operativo, ‘sys‘ está más orientada a la interacción con el intérprete de Python.
+Sus principales usos incluyen:
+
+* **Argumentos de Línea de Comandos**: Permite acceder y manipular los argumentos que se pasan al programa Python desde la línea de comandos.
+* **Gestión de la Salida del Programa**: Facilita el control sobre la salida estándar (stdout) y la salida de error (stderr), lo cual es esencial para la depuración y la presentación de resultados.
+* **Información del Intérprete**: Ofrece acceso a configuraciones y funcionalidades relacionadas con el intérprete de Python, como la versión de Python en uso, la lista de módulos importados y la gestión de la ruta de búsqueda de módulos.
+
+Ambas bibliotecas son cruciales para el desarrollo de aplicaciones Python que requieren interacción avanzada con el entorno de sistema y el intérprete. Su comprensión y uso adecuado permite a los desarrolladores escribir código más robusto, portable y eficiente.
+
+---
+
+Codigo: **OS & SYS**
+
+```python
+#!/usr/bin/env python3
+import os, sys
+
+os.system('cls' if os.name == 'nt' else 'clear') # Para limpiar terminal 
+
+pwd = os.getcwd() # Nos da el directorio actual de trabajo
+files = os.listdir(pwd) # Nos da los archivos del directorio que le estamos pasando
+print(files)
+
+for file in files:
+    print(file)
+
+# os.mkdir("mi_directorio") # Nos crea un directorio de trabajo en la ruta actual
+# os.path.exists('mi_archivo.txt') # nos buscar si un archivo existe
+
+# get_env = os.getenv('nombre_de_variable_entorno') # Nos buscar el valor de la variable de entorno
+
+#____________________________________________sys
+# Para controlar el numero de argumentos que se le pasa a un script
+
+print(f"\n[+] Nombre del script: {sys.argv[0]}") # Recopila el nombre del script
+
+print(f"[+] Total de argumentos que se estan pasando al programa: {len(sys.argv)}")
+print(f"[+] Mostrando el primer argumento: {sys.argv[1]}")
+print(f"[+] Mostrando el segundo argumento: {sys.argv[2]}")
+print(f"[+] Mostrando todos los argumentos {sys.argv}")
+print(f"[+] Mostrando todos los argumentos {', '.join(argument for argument in sys.argv)}")
+print(f"Mostrando las rutas de python: {f',\n'.join(ruta for ruta in sys.path)}")
+
+
+print(f"\n[+] Saliendo con un código de estado 1 (no exitoso)")
+sys.exit(1)
+```
+
+### Librería request (1/2)
+
+La biblioteca 'request' en python es una de las herramientas más populares y poderosas para realizar solicitudes HTTP. Su diseño es intuitivo y fácil de usar, lo que la hace una opción preferida para interactuar con APIs y servicios web.
+
+#### Introducción a request
+
+'requests' es una biblioteca de Python que simplifica enormemente el proceso de enviar solicitudes HTTP. Está diseñada para ser más fácil de usar que las opciones incorporadas en Python, como 'urllib', proporcionando una API más amigable.
+
+#### Características Principales
+
+* **Simplicidad y facilidad de uso**: Con requests, enviar solicitudes GET, POST, PUT, DELETE, entre otras, se puede realizar en pocas líneas de código. Su sintaxis es clara y concisa.
+* **Gestión de parámetros URL**: Permite manejar parámetros de consulta y cuerpos de solicitud con facilidad, automatizando la codificación de URL.
+* **Manejo de respuestas**: 'requests' facilita la interpretación de respuestas HTTP, proporcionando un objeto de respuesta que incluye el contenido, el estado, los encabezados, y más.
+* **Soporte para autenticaciones**: Ofrece soporte integrado para diferentes formas de autenticación, incluyenod autenticación básica, digest, y OAuth.
+* **Manejo de sesiones, y cookies:** Permite mantener sesiones gestionar cookies, lo cual es útil para interactuar con sitios web que requieren autenticación o mantienen estado.
+* **Soporte para SSL**: 'request' manje SSL (Secure Sockets Layer) y TLS (Transport Layer Security), permitiendo realizar solicitudes seguras a sitios HTTPS.
+* **Manejo de excepciones y errores**: Proporciona métodos para manejar y reportar errores de red y HTTP de manera efectiva.
+
+#### Uso práctico
+
+La biblioteca se utiliza ampliamente para interactuar con APIs RESTful, automatizar interacciones con sitios web, y en tareas de scrapping web, Sus capacidades para manejar solicitudes complejas y sus caracteríticas de seguridad la hacen ideal para una amplia gama de aplicaciones, desde scripts simples hasta sistemas empresariales complejos.
+
+#### Conclusión
+
+La comprensión y el uso efectivo de 'request' son habilidades esenciales para cualquier desarrollador Python que trabaje con HTTP y APIs web, Esta biblioteca no solo facilita la realización de tareas relacionadas con la red, sino que también ayuda a escribir código más limpio y mantenible.
+
+---
+
+Codigo: **get**
+
+```python
+#!/usr/bin/env python3
+
+import os, requests
+
+os.system('cls' if os.name == "nt" else "clear")
+
+values = {'key1':'value1', 'key2':'value2', 'key3':'value3'}
+
+response = requests.get("https://httpbin.org/get", params=values)
+
+print(f"\n[+] URL Final: {response.url}\n")
+print(response.text)
+```
+
+---
+
+Codigo: **post**
+
+```python
+#!/usr/bin/env python3
+
+import os, requests
+
+os.system('cls' if os.name == "nt" else "clear")
+
+payload = {'key1':'value1', 'key2':'value2', 'key3':'value3'}
+
+response = requests.post("https://httpbin.org/post", data=payload)
+
+print(f"\n[+] URL Final: {response.url}\n")
+print(response.text)
+```
+
+---
+
+Codigo: **tiempo de espera y manejo de excepciones**
+
+```python
+#!/usr/bin/env python3
+import os, requests
+
+os.system("cls" if os.name == "nt" else "clear")
+
+try:
+    response = requests.get("https://google.es", timeout=1)
+    response.raise_for_status()
+
+except requests.Timeout:
+    print(f"\n[!] La petición ha excedido el límite de tiempo de espera")
+
+except requests.HTTPError as http_err:
+    print(f"\n[!] El tipo de error fue {http_err}")
+
+except requests.RequestException as err:
+    print(f"[!] Error: {err}")
+
+else:
+    print(f"[+] No ha habido ningun error en la solicitud")
+```
+
+---
+
+Codigo: **recorriendo user-agent**
+
+```python
+#!/usr/bin/env python3
+
+import os, requests
+
+os.system("cls" if os.name == "nt" else "clear")
+
+response = requests.get("https://httpbin.org/get")
+data = response.json()
+
+if 'headers' in data and 'User-Agent' in data['headers']:
+    user_agent = data['headers']['User-Agent']
+    print(f"\n[+]User-Agent: {user_agent}\n")
+else:
+    print(f"\n[!] No existe este campo en la respuesta\n")
+```
+
+### Librería requests (2/2)
+
+#### Curiosidades y Aspectos Complementarios de requests
+
+* **Orígenes y Popularidad**: requests fue creada por Kenneth Reitz en 2011. Su diseño enfocado en la simplicidad y la legibilidad rápidamente la convirtió en una de las bibliotecas más populares en Python. Su lema es “HTTP for Humans“, reflejando su objetivo de hacer las solicitudes HTTP accesibles y fáciles para los desarrolladores.
+* **Comunidad y Contribuciones**: requests es un proyecto de código abierto y ha recibido contribuciones de numerosos desarrolladores. Esto asegura su constante actualización y adaptación a las nuevas necesidades y estándares de la web.
+* **Inspiración en Otros Lenguajes**: El diseño de requests se inspira en otras bibliotecas HTTP de alto nivel de otros lenguajes de programación, buscando combinar lo mejor de cada uno para crear una experiencia de usuario óptima en Python.
+* **Extensibilidad**: Aunque requests es poderosa por sí sola, su funcionalidad se puede ampliar con varios complementos. Esto incluye adaptadores para diferentes tipos de autenticación, soporte para servicios como AWS, o herramientas para aumentar su rendimiento.
+* **Uso en la Educación y la Industria**: Debido a su simplicidad y potencia, requests se ha convertido en una herramienta de enseñanza estándar para la programación de red en Python. Además, es ampliamente utilizada en la industria para desarrollar aplicaciones que requieren comunicación con servicios web.
+* **Casos de Uso Diversos**: Desde la automatización de tareas y el scraping web hasta el testing y la integración con APIs, requests tiene un rango de aplicaciones muy amplio. Su versatilidad la hace adecuada tanto para proyectos pequeños como para aplicaciones empresariales a gran escala.
+* **Soporte para Proxies y Timeouts**: requests ofrece un control detallado sobre aspectos como proxies y timeouts, lo cual es crucial en entornos de producción donde la gestión del tráfico de red y la eficiencia son importantes.
+* **Manejo Eficiente de Excepciones**: Proporciona una forma clara y consistente de manejar errores de red y HTTP, lo que ayuda a los desarrolladores a escribir aplicaciones más robustas y confiables.
+
+En resumen, requests no solo es una biblioteca de alto nivel para solicitudes HTTP en Python, sino que también es un ejemplo brillante de diseño de software y colaboración comunitaria. Su facilidad de uso, junto con su potente funcionalidad, la convierte en una herramienta indispensable para cualquier desarrollador que trabaje con Python en el ámbito de la web.
+
+---
+
+Codigo: **Autenticacion libreria requests**
+
+```python
+#!/usr/bin/env python3
+
+import os, requests
+
+from requests.auth import HTTPBasicAuth
+
+os.system("cls" if os.name == "nt" else "clear")
+
+response_uno = requests.get("https://httpbin.org/basic-auth/foo/bar", auth=HTTPBasicAuth('foo', 'foo'))
+response_dos = requests.get("https://httpbin.org/basic-auth/foo/bar", auth=('foo', 'bar'))
+
+print(response_uno.text)
+print(f"[!] Código de error: {response_uno.status_code} -> No autenticado\n")
+
+print(response_dos.text)
+print(response_dos.status_code)
+```
+
+---
+
+Codigo: **cookies requests**
+
+```python
+#!/usr/bin/env python3
+
+import os, requests
+os.system("cls" if os.name == "nt" else "clear")
+
+cookies = dict(cookies_are = "working")
+
+response_uno = requests.get("https://httpbin.org/cookies", cookies=cookies)
+
+print(cookies)
+print(response_uno.text)
+```
+
+---
+
+Codigo: **subir archivo mediante post con libreria requests**
+
+```python
+#!/usr/bin/env python3
+
+import os, requests
+os.system("cls" if os.name == "nt" else "clear")
+
+url = "https://httpbin.org/post"
+my_file = {'archivo': open('file.txt', 'r')}
+
+response = requests.post(url, files=my_file)
+
+print(response.text)
+```
+
+---
+
+Codigo: **manteniendo sesion de cookies con requests**
+
+```python
+#!/usr/bin/env python3
+
+import os, requests
+os.system("cls" if os.name == "nt" else "clear")
+
+url = "https://httpbin.org/cookies"
+set_cookies_url = "https://httpbin.org/cookies/set/my_cookie/1234"
+
+s =requests.session()
+
+response = s.get(set_cookies_url)
+response = s.get(url)
+print(response.text)
+```
+
+```python
+#!/usr/bin/env python3
+
+import os
+from requests import Request, Session
+os.system("cls" if os.name == "nt" else "clear")
+
+url = "https://httpbin.org/get"
+s = Session()
+headers = {"Custom-Header":"my_custom_header"}
+
+req = Request('GET', url, headers=headers)
+
+prepped = req.prepare()
+
+prepped.headers['Custom-Header'] = 'my_header_changed'
+prepped.headers['Another-Header'] = 'this_is_another_changed'
+response = s.send(prepped)
+
+print(response.text)
+```
+
+```python
+#!/usr/bin/env python3
+
+import os, requests
+
+os.system("cls" if os.name == "nt" else "clear")
+
+url = "http://github.com"
+
+r = requests.get(url) # Para forzar a ir al sitio de arriba y no lo cambie por https
+
+for request in r.history:
+    print(f"{request.url}:{request.status_code}")
+
+print(r.url)
+print(r.history)
+```
+
+```python
+#!/usr/bin/env python3
+
+import os, requests
+
+os.system("cls" if os.name == "nt" else "clear")
+
+url = "http://github.com"
+
+with requests.Session() as session:
+
+    session.auth = ("foo", "bar")
+
+    response1 = session.get("https://httpbin.org/basic-auth/foo/bar")
+    print(response1.text)
+
+    response2 = session.get("https://httpbin.org/get")
+    print(response2.text)
+```
+
+### Librería Urllib3
+
+‘urllib3‘ es una biblioteca de Python ampliamente utilizada para realizar solicitudes HTTP y HTTPS. Es conocida por su robustez y sus numerosas características, que la hacen una herramienta versátil para una variedad de aplicaciones de red. A continuación, se presenta una descripción detallada de ‘urllib3‘ y sus capacidades.
+
+#### Descripción Detallada de la Biblioteca urllib3
+
+#### **Funcionalidades Clave**
+
+* **Gestión de Pool de Conexiones**: Una de las características más destacadas de ‘urllib3‘ es su manejo de pools de conexiones, lo que permite reutilizar y mantener conexiones abiertas. Esto es eficiente en términos de rendimiento, especialmente cuando se hacen múltiples solicitudes al mismo host.
+* **Soporte para Solicitudes HTTP y HTTPS**: ‘urllib3‘ ofrece un soporte sólido para realizar solicitudes tanto HTTP como HTTPS, brindando la flexibilidad necesaria para trabajar con una variedad de servicios web.
+* **Reintentos Automáticos y Redirecciones**: Viene con un sistema incorporado para manejar reintentos automáticos y redirecciones, lo cual es esencial para mantener la robustez de las aplicaciones en entornos de red inestables.
+* **Manejo de Diferentes Tipos de Autenticación**: Proporciona soporte para varios esquemas de autenticación, incluyendo la autenticación básica y digest, lo que la hace apta para interactuar con una amplia gama de APIs y servicios web.
+* **Soporte para Características Avanzadas del HTTP**: Incluye soporte para características como la compresión de contenido, el streaming de solicitudes y respuestas, y la manipulación de cookies, ofreciendo así un control detallado sobre las operaciones de red.
+* **Gestión de SSL/TLS**: ‘urllib3‘ tiene capacidades avanzadas para manejar la seguridad SSL/TLS, incluyendo la posibilidad de trabajar con certificados personalizados y la verificación de la conexión segura.
+* **Tratamiento de Excepciones y Errores**: La biblioteca maneja de manera eficiente las excepciones y errores, permitiendo a los desarrolladores gestionar situaciones como tiempos de espera, conexiones fallidas y errores de protocolo.
+
+#### Aplicaciones y Uso
+
+‘urllib3‘ se utiliza en una variedad de contextos, desde scraping web y automatización de tareas, hasta la construcción de clientes para interactuar con APIs complejas. Su capacidad para manejar conexiones de manera eficiente y segura la hace adecuada para aplicaciones que requieren un alto grado de interacción de red, así como para escenarios donde el rendimiento y la fiabilidad son cruciales.
+
+#### Importancia en el Ecosistema de Python
+
+Si bien existen otras bibliotecas como ‘requests‘ que son más amigables para principiantes, ‘urllib3‘ se destaca por su control detallado y su rendimiento en situaciones que requieren un manejo más profundo de las conexiones de red. Es una biblioteca fundamental para desarrolladores que buscan un control más granular sobre sus operaciones HTTP/HTTPS en Python.
+
+* **Agregando al campo data con Urllib3**
+
+```python
+#!/usr/bin/env python3
+import os, urllib3, json
+
+os.system("cls" if os.name == "nt" else "clear")
+
+http = urllib3.PoolManager() # Controlador de conexiones
+# body = data
+# field = form
+data = "Esto es una prueba"
+data = {"clave":"valor"}
+
+#encoded_data = data.encode()# Se agrega al campo data
+encoded_data = json.dumps(data).encode()
+response = http.request('POST', 'https://httpbin.org/post', body=encoded_data)
+print(response.data.decode())
+
+```
+
+---
+
+Codigo: **Agregando un form con Urllib3**
+
+```python
+#!/usr/bin/env python3
+import os, urllib3, json
+
+os.system("cls" if os.name == "nt" else "clear")
+
+http = urllib3.PoolManager() # Controlador de conexiones
+
+response = http.request("POST", "https://httpbin.org/post", fields={"atributo":"valor"})
+print(response.data.decode())
+```
+
+---
+
+Codigo: **Estamos agregando body y header**
+
+```python
+#!/usr/bin/env python3
+import os, urllib3, json
+
+os.system("cls" if os.name == "nt" else "clear")
+
+http = urllib3.PoolManager() # Controlador de conexiones
+
+data =  {"atributo":"valor"}
+encoded_data = json.dumps(data).encode()
+
+response = http.request("POST", "https://httpbin.org/post", body=encoded_data, headers={"Content-Type":"application/jsssson"})
+print(response.data.decode())
+```
+
+---
+
+Codigo: **Creando nueva cabecera**
+
+```python
+#!/usr/bin/env python3
+import os, urllib3, json
+
+os.system("cls" if os.name == "nt" else "clear")
+
+http = urllib3.PoolManager() # Controlador de conexiones
+
+response = http.request("GET", "https://httpbin.org/get", headers={"NuevaCabecera":"Se tensa"})
+print(response.data.decode())
+```
+
+---
+
+Codigo: **Redireccionamiento con urllib3**
+
+```python
+#!/usr/bin/env python3
+import os, urllib3, json
+
+os.system("cls" if os.name == "nt" else "clear")
+
+http = urllib3.PoolManager() # Controlador de conexiones
+
+response = http.request("GET", "https://httpbin.org/redirect/1", redirect=False)
+print(response.status)
+
+print(f"Estamos siendo redirigidos a: {response.get_redirect_location()}")
+```
+
+---
+
+Codigo: ****
+
+```python
+#!/usr/bin/env python3
+import os, urllib3, json
+
+os.system("cls" if os.name == "nt" else "clear")
+
+# urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning) para evitar warnings ssl
+http = urllib3.PoolManager() # Controlador de conexiones
+
+response = http.request("GET", "https://httpbin.org/redirect/1", redirect=False)
+print(response.status)
+
+print(f"Estamos siendo redirigidos a: {response.get_redirect_location()}")
+```
+
+### Librería threading y multiprocesing
+
+Las bibliotecas ‘threading‘ y ‘multiprocessing‘ en Python son herramientas esenciales para la programación concurrente y paralela. Proporcionan mecanismos para ejecutar múltiples tareas simultáneamente, aprovechando mejor los recursos del sistema. A continuación, se presenta una descripción detallada de ambas bibliotecas y sus diferencias.
+
+#### Descripción Detallada de threading y multiprocessing
+
+#### Biblioteca threading
+
+‘threading‘ es una biblioteca para la programación concurrente que permite a los programas ejecutar múltiples ‘hilos‘ de ejecución al mismo tiempo. Los hilos son entidades más ligeras que los procesos, comparten el mismo espacio de memoria y son ideales para tareas que requieren poco procesamiento o que están limitadas por E/S.
+
+* **Uso Principal**: Ideal para tareas que no son intensivas en CPU o que esperan recursos (como E/S de red o de archivos).
+* **Ventajas**: Bajo costo de creación y cambio de contexto, compartición eficiente de memoria y recursos entre hilos.
+* **Desventajas**: Limitada por el Global Interpreter Lock (GIL) en CPython, que previene la ejecución de múltiples hilos de Python al mismo tiempo en un solo proceso.
+
+#### Biblioteca multiprocessing
+
+‘multiprocessing‘, por otro lado, se enfoca en la creación de procesos. Cada proceso en multiprocessing tiene su propio espacio de memoria. Esto significa que pueden ejecutarse en paralelo real en sistemas con múltiples núcleos de CPU, superando la limitación del GIL.
+
+* **Uso Principal**: Ideal para tareas intensivas en CPU que requieren paralelismo real.
+* **Ventajas**: Capacidad para realizar cálculos intensivos en paralelo, aprovechando múltiples núcleos de CPU.
+* **Desventajas**: Mayor costo en recursos y complejidad en la comunicación entre procesos debido a espacios de memoria separados.
+
+#### Diferencias Clave
+
+* **Modelo de Ejecución**: ‘threading‘ ejecuta hilos en un solo proceso compartiendo el mismo espacio de memoria, mientras ‘multiprocessing‘ ejecuta múltiples procesos con memoria independiente.
+* **Uso de CPU**: ‘multiprocessing‘ es más adecuado para tareas que requieren mucho cálculo y pueden beneficiarse de múltiples núcleos de CPU, mientras que ‘threading‘ es mejor para tareas limitadas por E/S.
+* **Global Interpreter Lock (GIL)**: ‘threading‘ está limitado por el GIL en CPython, lo que restringe la ejecución en paralelo de hilos, mientras que ‘multiprocessing‘ no tiene esta limitación.
+* **Gestión de Recursos**: ‘threading‘ es más eficiente en términos de memoria y creación de hilos, pero ‘multiprocessing‘ es más eficaz para tareas aisladas y seguras en cuanto a datos.
+
+#### Conclusión threading y multiprocesing
+
+Entender y utilizar adecuadamente ‘threading‘ y ‘multiprocessing‘ es crucial para optimizar aplicaciones Python, especialmente en términos de rendimiento y eficiencia. La elección entre ambas depende de las necesidades específicas de la tarea, como el tipo de carga de trabajo (CPU-intensiva vs E/S-intensiva) y los requisitos de arquitectura de la aplicación.
+
+---
+
+Codigo: **Ejemplo de uso de libreria threading**
+
+```python
+#!/usr/bin/env python3
+import os, threading, time
+os.system("cls" if os.name == "nt" else "clear")
+
+def tarea(num_tarea):
+    print(f"\n[+] Hilo {num_tarea} iniciando")
+    time.sleep(2)
+    print(f"\n[+] Hilo {num_tarea} finalizando")
+
+thread1 = threading.Thread(target=tarea, args=(1,)) # target=funcion, args=el valor que mandemos, recibe tuplas, en caso de un valor considerar la coma ','
+thread2 = threading.Thread(target=tarea, args=(2,)) # target=funcion, args=el valor que mandemos, recibe tuplas, en caso de un valor considerar la coma ','
+
+thread1.start() # Corremos los dos hilos en paralelo
+thread2.start() # Corremos los dos hilos en paralelo
+
+thread2.join() # Esperamos que los hilos finalizen
+thread1.join() # Esperamos que los hilos finalizen
+
+print(f"\n[+] Los hilos han finalizado exitosamente")
+```
+
+---
+
+Codigo: **Ejemplo de uso de libreria multiprocesing**
+
+```python
+#!/usr/bin/env python3
+import os, multiprocessing, time
+os.system("cls" if os.name == "nt" else "clear")
+
+def tarea(num_tarea):
+    print(f"\n[+] Proceso {num_tarea} iniciando")
+    time.sleep(2)
+    print(f"\n[+] Proceso {num_tarea} finalizando")
+
+
+if __name__ == '__main__':
+    
+    proceso1 = multiprocessing.Process(target=tarea, args=(1,))
+    proceso2 = multiprocessing.Process(target=tarea, args=(2,))
+
+    proceso1.start()
+    proceso2.start()
+
+    proceso1.join()
+    proceso2.join()
+
+    print(f"\n[+] Los hilos han finalizado exitosamente")
+```
+
+---
+
+Codigo: **Ejemplo de solicitud a paginas web sin emplear hilos**
+
+```python
+#!/usr/bin/env python3
+import os, requests, threading, time
+os.system("cls" if os.name == "nt" else "clear")
+
+dominios = ["https://google.es", "https://xvideos.com", "https://wikipedia.org", "https://yahoo.com"]
+
+start_time = time.time()
+
+for url in dominios:
+    response = requests.get(url)
+    print(f"[+] URL [{url}]: {len(response.content)} bytes\n")
+
+end_time = time.time()
+
+print(f"[+] Tiempo total transcurrido: {end_time - start_time}")
+```
+
+---
+
+Codigo: **empleando hilos threading**
+
+```python
+#!/usr/bin/env python3
+import os, requests, threading, time
+os.system("cls" if os.name == "nt" else "clear")
+
+def realizar_peticion(url):
+    response = requests.get(url)
+    print(f"[+] URL [{url}]: {len(response.content)} bytes\n")
+
+dominios = ["https://google.es", "https://xvideos.com", "https://wikipedia.org", "https://yahoo.com"]
+
+start_time = time.time()
+
+hilos = []
+for url in dominios:
+    hilo = threading.Thread(target=realizar_peticion, args=(url,))
+    hilo.start()
+    hilos.append(hilo)
+
+for hilo in hilos:
+    hilo.join()
+
+end_time = time.time()
+
+print(f"[+] Tiempo total transcurrido: {end_time - start_time}")
+```
+
+---
+
+Codigo: **Ejemplo con multiprocessing**
+
+```python
+#!/usr/bin/env python3
+import os, requests, multiprocessing, time
+os.system("cls" if os.name == "nt" else "clear")
+
+def realizar_peticion(url):
+    response = requests.get(url)
+    print(f"[+] URL [{url}]: {len(response.content)} bytes\n")
+
+dominios = ["https://google.es", "https://xvideos.com", "https://wikipedia.org", "https://yahoo.com"]
+
+if __name__ == "__main__":
+
+    start_time = time.time()
+
+    procesos = []
+    for url in dominios:
+        proceso = multiprocessing.Process(target=realizar_peticion, args=(url,))
+        proceso.start()
+        procesos.append(proceso)
+
+    for proceso in procesos:
+        proceso.join()
+
+    end_time = time.time()
+
+    print(f"[+] Tiempo total transcurrido: {end_time - start_time}")
+```
+
+## Desarrollo de aplicaciones de escritorio con Python
+
+### Introducción a las interfaces gráficas de usuario (GUI)
+
+Tkinter es una biblioteca estándar de Python para la creación de interfaces gráficas de usuario (GUI). Es una interfaz de programación para ‘Tk‘, un toolkit de GUI que es parte de Tcl/Tk. Tkinter es notable por su simplicidad y eficiencia, siendo ampliamente utilizado en aplicaciones de escritorio y herramientas educativas.
+
+#### ¿Por qué Tkinter?
+
+* **Facilidad de Uso**: Tkinter es amigable para principiantes. Su estructura sencilla y clara lo hace ideal para aprender los conceptos básicos de la programación de GUI.
+* **Portabilidad**: Las aplicaciones creadas con Tkinter pueden ejecutarse en diversos sistemas operativos sin necesidad de modificar el código.
+* **Amplia Disponibilidad**: Al ser parte de la biblioteca estándar de Python, Tkinter está disponible por defecto en la mayoría de las instalaciones de Python, lo que elimina la necesidad de instalaciones adicionales.
+
+En esta sección del curso, nos sumergiremos en el mundo de Tkinter, empezando con una introducción detallada que nos permitirá entender y utilizar sus múltiples funcionalidades. A través de proyectos prácticos, aplicaremos estos conocimientos para construir desde aplicaciones simples hasta interfaces más complejas, proporcionando una base sólida para cualquiera interesado en el desarrollo de GUI con Python.
+
+### Desarrollo de aplicaciones GUI con Tkinter (1/8)
+
+#### Tkinter: Explorando Componentes Clave
+
+1 tk.Label
+
+* **Descripción**: ‘tk.Label‘ es un widget en Tkinter utilizado para mostrar texto o imágenes. El texto puede ser estático o actualizarse dinámicamente.
+* **Uso Común**: Se usa para añadir etiquetas informativas en una GUI, como títulos, instrucciones o información de estado.
+* **Características Clave**:
+    **text**: Para establecer el texto que se mostrará.
+    **font**: Para personalizar la tipografía.
+    **bg y fg**: Para establecer el color de fondo (bg) y de texto (fg).
+    **image**: Para mostrar una imagen.
+    **wraplength**: Para especificar a qué ancho el texto debería envolverse.
+
+2 mainloop()
+
+* **Descripción**: ‘mainloop()‘ es una función esencial en Tkinter que ejecuta el bucle de eventos de la aplicación. Este bucle espera eventos, como pulsaciones de teclas o clics del mouse, y los procesa.
+* **Importancia**: Sin ‘mainloop()‘, la aplicación GUI no responderá a eventos y parecerá congelada. Es lo que mantiene viva la aplicación.
+
+3 pack()
+
+* **Descripción**: ‘pack()‘ es un método de geometría usado para colocar widgets en una ventana.
+* **Funcionalidad**: Organiza los widgets en bloques antes de colocarlos en la ventana. Los widgets se “empaquetan” en el orden en que se llama a ‘pack()‘.
+* **Características Clave**:
+    **side**: Para especificar el lado de la ventana donde se ubicará el widget (por ejemplo, top, bottom, left, right).
+    **fill**: Para determinar si el widget se expande para llenar el espacio disponible.
+    **expand**: Para permitir que el widget se expanda para ocupar cualquier espacio adicional en la ventana.
+
+4 grid()
+
+* **Descripción**: ‘grid()‘ es otro método de geometría utilizado en Tkinter para colocar widgets.
+* **Funcionalidad**: Organiza los widgets en una cuadrícula. Se especifica la fila y la columna donde debe ir cada widget.
+    **Características Clave**:
+        **row y column**: Para especificar la posición del widget en la cuadrícula.
+        **rowspan y columnspan**: Para permitir que un widget ocupe múltiples filas o columnas.
+        **sticky**: Para determinar cómo se alinea el widget dentro de su celda (por ejemplo, N, S, E, W).
+
+#### Conclusión de tkinter 1/8
+
+Estos componentes de Tkinter (tk.Label, mainloop(), pack(), grid()) son fundamentales para la creación de aplicaciones GUI eficientes y atractivas. Comprender su funcionamiento y saber cómo implementarlos adecuadamente es crucial para cualquier desarrollador que busque crear interfaces de usuario interactivas y funcionales con Python y Tkinter.
+
+---
+
+Codigo: **Ejemplo con pack()**
+
+```python
+
+#!/usr/bin/env python3
+import os
+import tkinter as tk
+os.system("cls" if os.name == "nt" else "clear")
+
+def accion_de_boton():
+    os.system("cls" if os.name == "nt" else "clear")
+    print("[+] Se ha presionado el botón\n")
+    
+# Para representar widgets en las ventanas hay tres métodos, pack(), grid(), place()
+
+root = tk.Tk() # Instanciamos el objeto raiz para crear la ventana
+root.title("YOU HAVE BEEN PWND HAHAHA") # Establecemos el titulo de la ventana
+
+label1 = tk.Label(root, text="Hola mundo", bg="blue") # Se crea la etiqueta
+label1.pack(fill=tk.X) # fill=tk.X es para que el widget ocupe todo el espacio sobre x
+
+label2 = tk.Label(root, text="Etiqueta 2", bg="red")
+label2.pack(fill=tk.X)
+
+label3 = tk.Label(root, text="Etiqueta 3", bg="green")
+label3.pack(side=tk.LEFT, fill=tk.Y) # side es para establecer de que lado se posicionará y con fill decimos que ocupará todo el eje Y
+
+label4 = tk.Label(root, text="Etiqueta 4", bg="yellow")
+label4.pack(side=tk.RIGHT, fill=tk.Y) # side es para establecer de que lado se posicionará y con fill decimos que ocupará todo el eje Y
+
+label5 = tk.Label(root, text="Etiqueta 5", bg="violet")
+label5.pack(side=tk.BOTTOM, fill=tk.Y) # side es para establecer de que lado se posicionará y con fill decimos que ocupará todo el eje Y
+
+button1 = tk.Button(root, text="Présioname y verás como se tensa", command=accion_de_boton) # command = accion que queremos llevar acabo con el boton
+button1.pack()
+
+root.mainloop()
+```
+
+---
+
+Codigo: **Ejemplo con grid()**
+
+```python
+#!/usr/bin/env python3
+import os
+import tkinter as tk
+os.system("cls" if os.name == "nt" else "clear")
+
+def accion_de_boton():
+    os.system("cls" if os.name == "nt" else "clear")
+    print("[+] Se ha presionado el botón\n")
+    
+# Para representar widgets en las ventanas hay tres métodos, pack(), grid(), place()
+
+root = tk.Tk() # Instanciamos el objeto raiz para crear la ventana
+root.title("YOU HAVE BEEN PWND HAHAHA") # Establecemos el titulo de la ventana
+
+label1 = tk.Label(root, text="Hola mundo", bg="blue") # Se crea la etiqueta
+label2 = tk.Label(root, text="Etiqueta 2", bg="red")
+label3 = tk.Label(root, text="Esta es una prueba de texto en etiqueta de tkinter", bg="green")
+label4 = tk.Label(root, text="Etiqueta 4", bg="yellow")
+label5 = tk.Label(root, text="Etiqueta 5", bg="violet")
+button1 = tk.Button(root, text="Présioname y verás como se tensa", command=accion_de_boton) # command = accion que queremos llevar acabo con el boton
+
+label1.grid(row=0, column=0) # lo posiciona arriba a la izquierda
+label2.grid(row=0, column=1) # lo posiciona arriba a la derecha
+label3.grid(row=1, column=0, columnspan=2) # 
+
+root.mainloop()
+```
+
+### Desarrollo de aplicaciones GUI con Tkinter (2/8)
+
+#### Tkinter: Profundizando en Componentes y Gestión de Layout
+
+1. place()
+
+    Descripción: ‘place()‘ es un método de gestión de geometría en Tkinter que permite posicionar widgets en ubicaciones específicas mediante coordenadas x-y.
+    Características Clave:
+        ‘x’ y ‘y’: Especifican la posición del widget en términos de coordenadas.
+        width y height: Definen el tamaño del widget.
+        anchor: Determina desde qué punto del widget se aplican las coordenadas (por ejemplo, ‘nw‘ para esquina superior izquierda).
+        Posiciones Relativas: Se pueden utilizar valores relativos (por ejemplo, ‘relx‘, ‘rely‘) para posicionar widgets en relación con el tamaño de la ventana, lo que hace que la interfaz sea más adaptable al cambiar el tamaño de la ventana.
+
+2. tk.Entry()
+
+    Descripción: ‘tk.Entry()‘ es un widget en Tkinter que permite a los usuarios introducir una línea de texto.
+    Uso Común: Ideal para campos de entrada de texto como nombres de usuario, contraseñas, etc.
+    Funcionalidades Clave:
+        get(): Para obtener el texto del campo de entrada.
+        delete(): Para borrar texto del campo de entrada.
+        insert(): Para insertar texto en una posición específica.
+
+3. tk.Button()
+
+    Descripción: ‘tk.Button()‘ es un widget que los usuarios pueden presionar para realizar una acción.
+    Uso Común: Ejecutar una función o comando cuando se hace clic en él.
+    Características Clave:
+        text: Define el texto que aparece en el botón.
+        command: Establece la función que se llamará cuando se haga clic en el botón.
+
+4. geometry()
+
+    Descripción: ‘geometry()‘ es una función que define las dimensiones y la posición inicial de la ventana principal.
+    Funcionalidad: Permite especificar el tamaño y la ubicación de la ventana en el formato ‘ancho x alto + X + Y‘.
+    Importancia: Es fundamental para establecer el tamaño inicial de la ventana y su posición en la pantalla.
+
+5. tk.Text()
+
+    Descripción: ‘tk.Text()‘ es un widget que permite la entrada y visualización de múltiples líneas de texto.
+    Uso Común: Ideal para campos de texto más extensos, como áreas de comentarios, editores de texto, etc.
+    Funcionalidades Clave:
+        Similar a ‘tk.Entry()‘, pero diseñado para manejar texto de varias líneas.
+        Permite funciones como copiar, pegar, seleccionar texto.
+
+Conclusión
+
+Estos componentes y funciones (place(), tk.Entry(), tk.Button(), geometry(), tk.Text()) son esenciales en la construcción de interfaces de usuario ricas y funcionales con Tkinter. Proporcionan la flexibilidad necesaria para crear aplicaciones GUI interactivas y atractivas, adaptándose a una amplia gama de necesidades de diseño de interfaz.
+
+---
+
+Codigo: **Ejemplo con place()**
+
+```python
+#!/usr/bin/env python3
+import os
+import tkinter as tk
+os.system("cls" if os.name == "nt" else "clear")
+
+def accion_de_boton():
+    os.system("cls" if os.name == "nt" else "clear")
+    print("[+] Se ha presionado el botón\n")
+    
+# Para representar widgets en las ventanas hay tres métodos, pack(), grid(), place()
+
+root = tk.Tk() # Instanciamos el objeto raiz para crear la ventana
+root.title("YOU HAVE BEEN PWND HAHAHA") # Establecemos el titulo de la ventana
+
+label1 = tk.Label(root, text="Hola mundo", bg="blue") # Se crea la etiqueta
+label2 = tk.Label(root, text="Etiqueta 2", bg="red")
+label3 = tk.Label(root, text="Esta es una prueba", bg="green")
+label4 = tk.Label(root, text="Etiqueta 4", bg="yellow")
+label5 = tk.Label(root, text="Etiqueta 5", bg="violet")
+button1 = tk.Button(root, text="Présioname y verás como se tensa", command=accion_de_boton) # command = accion que queremos llevar acabo con el boton
+
+label1.place(x=20, y=20) # lo posiciona arriba a la izquierda
+label2.place(relx=0.8, rely=0.2) # lo posiciona arriba a la derecha
+label3.place(relx=0.5, rely=0.5, anchor=tk.CENTER) # 
+
+root.mainloop()
+```
+
+---
+
+Codigo: **Ejemplo para crear la geometria de la ventana**
+
+```python
+#!/usr/bin/env python3
+import os
+import tkinter as tk
+os.system("cls" if os.name == "nt" else "clear")
+
+root = tk.Tk()
+root.title("YOU HAVE BEEN PWND HAHAHA")
+root.geometry("480x240") # Creamos la proporcion de la ventana
+
+label1 = tk.Label(root, text="Hola mundo", bg="blue")
+label2 = tk.Label(root, text="Etiqueta 2", bg="red")
+label3 = tk.Label(root, text="Esta es una prueba", bg="green")
+label1.place(x=20, y=20)
+label2.place(relx=0.8, rely=0.2)
+label3.place(relx=0.5, rely=0.5, anchor=tk.CENTER) # 
+
+root.mainloop()
+```
+
+---
+
+Codigo: **Ejemplo entry()**
+
+```python
+#!/usr/bin/env python3
+import os
+import tkinter as tk
+os.system("cls" if os.name == "nt" else "clear")
+
+def get_data():
+    os.system("cls" if os.name == "nt" else "clear")
+    data = entry1.get()
+    print(f"\n[+] Datos introducidos por el usuario: {data}")
+
+root = tk.Tk()
+root.geometry("480x240")
+root.title("Entry() Widget -> YOU WILL BE PWND")
+
+entry1 = tk.Entry(root)
+entry1.pack(pady=25, padx=15, fill=tk.Y) # Con relacion al borde superior
+
+buton1 = tk.Button(root, text="Recoger datos de entrada", command=get_data)
+buton1.pack(padx=15, fill=tk.X)
+
+root.mainloop()
+```
+
+---
+
+Codigo: **Ejemplo con text()**
+
+```python
+#!/usr/bin/env python3
+import os
+import tkinter as tk
+os.system("cls" if os.name == "nt" else "clear")
+
+def get_data(*args):
+    os.system("cls" if os.name == "nt" else "clear")
+    data = entry1.get("3.0", tk.END) # 3.0 hace referencia a que de la fila 3 en adelante leera los datos, tk.END hace referencia hasta el final
+    print(f"\n[+] Datos introducidos por el usuario: {data}")
+
+root = tk.Tk()
+root.geometry("720x480")
+root.title("Entry() Widget -> YOU WILL BE PWND")
+
+entry1 = tk.Text(root)
+entry1.pack(pady=15, padx=15, fill=tk.X) # Con relacion al borde superior
+
+buton1 = tk.Button(root, text="Recoger datos de entrada", command=get_data)
+buton1.pack(padx=15, fill=tk.X)
+
+root.mainloop()
+```
+
+### Desarrollo de aplicaciones GUI con Tkinter (3/8)
+
+Tkinter: Explorando Widgets Avanzados y Funcionalidades de Diálogo
+
+1. Frame()
+
+    Descripción: ‘Frame()‘ es un widget en Tkinter utilizado como contenedor para otros widgets.
+    Uso Común: Organizar el layout de la aplicación, agrupando widgets relacionados.
+    Características Clave:
+        Actúa como un contenedor invisible que puede contener otros widgets.
+        Útil para mejorar la organización y la gestión del layout en aplicaciones complejas.
+
+2. Canvas()
+
+    Descripción: ‘Canvas()‘ es un widget que proporciona un área para dibujar gráficos, líneas, figuras, etc.
+    Funciones de Dibujo:
+        create_oval(): Crea figuras ovales o círculos. Los parámetros especifican las coordenadas del rectángulo delimitador.
+        create_rectangle(): Dibuja rectángulos. Los parámetros definen las coordenadas de las esquinas.
+        create_line(): Permite dibujar líneas. Se especifican las coordenadas de inicio y fin de la línea.
+    Uso Común: Crear gráficos, interfaces de juegos, o elementos visuales personalizados.
+
+3. Menu()
+
+    Descripción: ‘Menu()‘ se utiliza para crear menús en una aplicación Tkinter.
+    Uso Común: Añadir barras de menús con opciones como ‘Archivo‘, ‘Editar‘, ‘Ayuda‘, etc.
+    Características Clave:
+        Se pueden crear menús desplegables y menús contextuales.
+        Los menús pueden contener comandos, opciones de selección y otros submenús.
+
+4. messagebox
+
+    Descripción: ‘messagebox‘ es un módulo en Tkinter que proporciona ventanas emergentes de diálogo.
+    Funciones Comunes:
+        showinfo(), showwarning(), showerror(): Muestran mensajes informativos, de advertencia y de error, respectivamente.
+    Uso Común: Informar al usuario sobre eventos, confirmaciones, errores o advertencias.
+
+5. filedialog
+
+    Descripción: ‘filedialog‘ es un módulo que ofrece diálogos para seleccionar archivos y directorios.
+    Funciones Clave:
+        askopenfilename(): Abre un cuadro de diálogo para seleccionar un archivo para abrir.
+        asksaveasfilename(): Abre un cuadro de diálogo para seleccionar la ubicación y el nombre del archivo para guardar.
+        askdirectory(): Permite al usuario seleccionar un directorio.
+    Uso Común: Integrar la funcionalidad de apertura y guardado de archivos en aplicaciones.
+
+Conclusión
+
+El dominio de estos widgets y módulos (Frame(), Canvas(), Menu(), messagebox, filedialog) es crucial para desarrollar aplicaciones GUI interactivas y completas en Tkinter. Cada uno aporta funcionalidades específicas que permiten crear interfaces de usuario más ricas y dinámicas, adaptadas a una amplia variedad de necesidades.
+
+---
+
+Codigo: **frame**
+
+```python
+#!/usr/bin/env python3
+import os
+import tkinter as tk
+os.system("cls" if os.name == "nt" else "clear")
+
+root = tk.Tk()
+root.title("FRAMES IN TKINTER")
+root.geometry("720x480")
+
+frame1 = tk.Frame(root, bg="blue", bd=5)
+frame1.place(relx=0.5, rely=0.5,anchor=tk.CENTER)
+
+label1 = tk.Label(frame1, text="Label1", bg="green")
+label2 = tk.Label(frame1, text="Label2", bg="red")
+label1.pack(fill=tk.X)
+label2.pack(fill=tk.X)
+
+root.mainloop()
+```
+
+---
+
+Codigo: **canva**
+
+```python
+#!/usr/bin/env python3
+import os
+import tkinter as tk
+os.system("cls" if os.name == "nt" else "clear")
+
+root = tk.Tk()
+root.title("CANVAS IN TKINTER")
+root.geometry("720x480")
+
+canvas1 = tk.Canvas(root, width=480, height=240, bg="white")
+canvas1.pack(pady=15)
+
+oval = canvas1.create_oval(50, 50,150,150,fill="red")
+rect = canvas1.create_rectangle(300, 50, 450, 100, fill="green")
+line = canvas1.create_line(50, 100, 100,220,fill="blue")
+
+root.mainloop()
+```
+
+---
+
+Codigo: **menu con messagebox**
+
+```python
+#!/usr/bin/env python3
+import os
+import tkinter as tk
+from tkinter import messagebox
+
+os.system("cls" if os.name == "nt" else "clear")
+
+root = tk.Tk()
+root.title("MENU IN TKINTER")
+root.geometry("720x480")
+
+def accion_menu():
+    messagebox.showinfo("menu","Menu se ha tensado la cosa")
+
+barra_menu = tk.Menu(root) # Creamos la barra de menu
+root.config(menu=barra_menu) # Incorporamos la barra a la ventana
+
+menu1 = tk.Menu(barra_menu, tearoff=0) # Agregamos la primera opcion a la barra
+barra_menu.add_cascade(label="Menu", menu=menu1) # Mostramos menu1 dentro de la barra
+
+menu1.add_command(label="Opcion 1") # Agregamos submenus al menu
+menu1.add_command(label="Opcion 2") # Agregamos submenus al menu 
+
+menu2 = tk.Menu(barra_menu, tearoff=0)
+barra_menu.add_cascade(label="Extras", menu=menu2)
+menu2.add_command(label="Se tensa")
+menu2.add_command(label="Se tensa de lo lindo", command=accion_menu)
+
+root.mainloop()
+```
+
+---
+
+Codigo: **menu con filedialog y un boton**
+
+```python
+#!/usr/bin/env python3
+import os
+import tkinter as tk
+from tkinter import filedialog
+
+os.system("cls" if os.name == "nt" else "clear")
+
+root = tk.Tk()
+root.title("MENU IN TKINTER")
+root.geometry("240x120")
+
+def abrir_archivo():
+    ruta_archivo = filedialog.askopenfilename()
+    print(f"\n[+] Ruta absoluta del archivo: {ruta_archivo}")
+
+boton = tk.Button(root, text="Abrir archivo", command=abrir_archivo)
+boton.pack(pady=20)
+
+root.mainloop()
+```
+
+### Desarrollo de aplicaciones GUI con Tkinter (4/8)
+
+En esta clase, abordaremos un proyecto que consolidará todo lo aprendido hasta ahora en Tkinter: la creación de nuestro propio editor de texto, similar al Bloc de Notas.
+
+Este será un excelente ejercicio para aplicar nuestras habilidades en un contexto práctico y realista, permitiéndonos ver cómo los componentes individuales de Tkinter se unen para formar una aplicación funcional.
+
+Nuestro editor de texto incluirá funcionalidades básicas como:
+
+* Crear un nuevo archivo
+* Abrir y editar archivos existentes
+* Guardar los cambios
+* Cerrar la aplicación
+
+Para esto, haremos uso de varios widgets y técnicas de Tkinter que hemos estudiado, como ‘tk.Text‘ para el área de edición, ‘Menu()‘ para la barra de menús y ‘filedialog‘ para la gestión de archivos.
+
+Adoptaremos un enfoque de Programación Orientada a Objetos (POO) en este proyecto. Utilizaremos clases para estructurar nuestro código, lo que nos permitirá dividir la funcionalidad de la aplicación en bloques lógicos y reutilizables. Este método no solo facilitará la organización y gestión del código, sino que también nos proporcionará una sólida base para el mantenimiento y la escalabilidad futura del proyecto.
+
+Este proyecto no solo nos permitirá practicar la integración de los diferentes componentes y módulos de Tkinter, sino que también nos dará la oportunidad de experimentar con el diseño de interfaces de usuario y el manejo de archivos de texto.
+
+### Desarrollo de aplicaciones GUI con Tkinter (5/8)
+
+En esta clase, continuaremos con nuestro proyecto del editor de texto, con el objetivo de finalizarlo. Hasta ahora, hemos logrado implementar funciones clave como la creación, edición, guardado y apertura de archivos de texto. En esta sesión, nos enfocaremos en pulir nuestra aplicación, asegurándonos de que todas las funcionalidades trabajen de manera fluida y eficiente.
+
+Una vez que hayamos completado y perfeccionado nuestro editor de texto, daremos un paso adelante en nuestro aprendizaje con el inicio de un nuevo y fascinante proyecto: la creación de una calculadora con interfaz gráfica interactiva. Este proyecto nos permitirá aplicar y expandir aún más nuestros conocimientos en Tkinter, abordando nuevos desafíos y explorando diferentes aspectos de la creación de GUIs.
+
+En la calculadora, implementaremos funciones básicas como:
+
+* Sumar
+* Restar
+* Multiplicar
+* Dividir
+
+Así como una interfaz de usuario intuitiva que permita a los usuarios interactuar fácilmente con la aplicación. Este proyecto no solo reforzará nuestras habilidades en Tkinter y la programación orientada a objetos, sino que también nos brindará la oportunidad de abordar problemas de lógica de programación y diseño de interfaces de usuario.
+
+Con estos dos proyectos, nuestro editor de texto y la calculadora, estaremos no solo consolidando nuestros conocimientos teóricos, sino también ganando experiencia práctica valiosa en el desarrollo de aplicaciones de escritorio con Python y Tkinter. Estos proyectos nos servirán como excelentes ejemplos de lo que podemos lograr y serán una base sólida para futuros proyectos más complejos.
+
+---
+
+Codigo: **app de notas**
+
+```python
+#!/usr/bin/env python3
+import os
+import tkinter as tk
+from tkinter import filedialog, messagebox
+os.system("cls" if os.name == "nt" else "clear")
+
+class SimpleTextEditor:
+    def __init__(self, root):
+        self.root = root
+        self.text_area = tk.Text(self.root)
+        self.text_area.pack(fill=tk.BOTH, expand=1)
+        self.current_open_file = ""
+
+    def new_file(self):
+        self.text_area.delete("1.0", tk.END)
+        self.current_open_file = ""
+    
+    def open_file(self):
+        filename = filedialog.askopenfilename()
+
+        if filename:
+            self.text_area.delete("1.0", tk.END)
+            with open(filename, "r") as file:
+                self.text_area.insert("1.0", file.read())
+
+            self.current_open_file = filename
+
+    def save_file(self):
+        if not self.current_open_file:
+            new_file_path = filedialog.asksaveasfilename()
+
+            if new_file_path:
+                self.current_open_file = new_file_path
+            else:
+                return
+            
+        with open(self.current_open_file, "w") as file:
+            file.write(self.text_area.get("1.0", tk.END))
+
+    def quit_confirm(self):
+        if messagebox.askokcancel("Salir", "Estas seguro que deseas salir?"): # Me devuelve True o False por consola
+            self.root.destroy()
+       
+root = tk.Tk()
+root.title("Aplicacion de toma de nota")
+root.geometry("700x500")
+
+editor = SimpleTextEditor(root)
+
+menu_bar = tk.Menu(root)
+menu_options = tk.Menu(menu_bar, tearoff=0)
+
+menu_options.add_command(label="Nuevo", command=editor.new_file)
+menu_options.add_command(label="Abrir", command=editor.open_file)
+menu_options.add_command(label="Guardar", command=editor.save_file)
+menu_options.add_command(label="Salir", command=editor.quit_confirm)
+
+root.config(menu=menu_bar)
+menu_bar.add_cascade(label="Archivo", menu=menu_options)
+
+root.mainloop()
+```
+
+### Desarrollo de aplicaciones GUI con Tkinter (6/8)
+
+En esta clase, seguiremos avanzando con nuestro proyecto de la calculadora con interfaz gráfica. Nos enfocaremos en perfeccionar la funcionalidad y el diseño de la aplicación, asegurando que cada elemento opere de manera efectiva y que la interfaz sea intuitiva y atractiva.
+
+Esta sesión nos brinda la oportunidad de aplicar de manera práctica nuestros conocimientos en Tkinter y la programación orientada a objetos, avanzando hacia la finalización de nuestro proyecto.
+
+### Desarrollo de aplicaciones GUI con Tkinter (7/8)
+
+En esta clase, seguiremos avanzando con nuestro proyecto de la calculadora con interfaz gráfica. Nos enfocaremos en perfeccionar la funcionalidad y el diseño de la aplicación, asegurando que cada elemento opere de manera efectiva y que la interfaz sea intuitiva y atractiva.
+
+Esta sesión nos brinda la oportunidad de aplicar de manera práctica nuestros conocimientos en Tkinter y la programación orientada a objetos, avanzando hacia la finalización de nuestro proyecto.
+
+### Desarrollo de aplicaciones GUI con Tkinter (8/8)
+
+En esta clase, damos por concluido nuestro emocionante proyecto de la calculadora con interfaz gráfica. Esta sesión representa no solo la culminación de nuestro trabajo en este proyecto específico, sino también la consolidación de las habilidades y conocimientos que hemos adquirido y desarrollado a lo largo de las clases anteriores.
+
+Durante esta sesión final, haremos una revisión exhaustiva de nuestro proyecto, asegurándonos de que todas las funcionalidades estén trabajando sin problemas y que la interfaz de usuario sea tan intuitiva y atractiva como lo planeamos. Será el momento de hacer los ajustes finales, resolver cualquier problema pendiente y posiblemente añadir algunas características adicionales que puedan enriquecer aún más nuestra aplicación.
+
+También dedicaremos tiempo a reflexionar sobre el proceso de desarrollo, discutiendo lo que aprendimos, los desafíos que enfrentamos y cómo los superamos. Esta discusión será valiosa para entender mejor nuestras experiencias de aprendizaje y cómo podemos aplicar estos conocimientos en proyectos futuros.
+
+Al final de la clase, celebraremos el logro de haber creado una calculadora funcional y bien diseñada desde cero, utilizando Tkinter y los principios de la programación orientada a objetos. Este proyecto no solo ha fortalecido nuestras habilidades técnicas, sino que también ha mejorado nuestra capacidad de pensamiento crítico y resolución de problemas en el ámbito del desarrollo de software.
+
+* **Ver el manual de ASCII para saber los eventos de teclado**
+
+---
+
+Codigo: **Calculadora**
+
+```python
+#!/usr/bin/env python3
+import os
+import tkinter as tk
+os.system("cls" if os.name == "nt" else "clear")
+
+class Calculadora:
+    def __init__(self, master):
+        self.master = master
+        self.display = tk.Entry(master, width=15, font=("Arial", 23), bd=10, insertwidth=1, bg="#6495d3", justify="right")
+        self.display.grid(row=0, column=0, columnspan=4)
+        self.op_verification = False
+        self.current = ""
+        self.op = ""
+        self.total = 0
+
+        row = 1
+        col = 0
+
+        buttons = [
+            "7", "8", "9", "/",
+            "4", "5", "6", "*",
+            "1", "2", "3", "-",
+            "C", "0", ".", "+",
+            "="
+        ]
+
+        for button in buttons:
+            self.build_button(button, row, col)
+            col += 1
+
+            if col > 3:
+                col = 0
+                row += 1
+
+        self.master.bind("<Key>", self.key_press) # Detecta el teclado
+
+    def key_press(self, event):
+        key = event.char
+        if key == "\r":
+            self.calculate()
+            return
+        elif key == "\x08":
+            self.clear_display
+            return
+        elif key == "\x1b":
+            self.master.quit()
+            return
+
+        self.click(key)
+
+    def clear_display(self):
+        self.display.delete(0, tk.END)
+        self.op_verification = False
+        self.current = ""
+        self.op = ""
+        self.total = 0
+    
+    def calculate(self):
+        if self.current and self.op:
+            if self.op == "/":
+                self.total /= float(self.current)
+            if self.op == "*":
+                self.total *= float(self.current)
+            if self.op == "+":
+                self.total += float(self.current)
+            if self.op == "-":
+                self.total -= float(self.current)
+
+        self.display.delete(0, "end")
+        self.display.insert("end", round(self.total,3))
+    
+    def click(self, button):
+        if self.op_verification:
+            self.op_verification = False
+
+        self.display.insert("end", button)
+
+        if button in "0123456789" or button == ".":
+            self.current += button
+        else:
+            if self.current:
+                if not self.op:
+                    self.total = float(self.current)
+            
+            self.current = ""
+
+            self.op_verification = True
+            self.op = button
+
+        print(f"\n[+] Has presionado: {button}")
+        print(f"[+] La primera combinacion es: {self.current}")
+        print(f"[+] Status op_verification: {self.op_verification}")
+        print(f"[+] Tipo de operacion que deseo efectuar: {self.op}")
+        print(f"[+] Total: {self.total}")
+
+
+    def build_button(self, button, row, col):
+        if button == "C":
+            b = tk.Button(self.master, text=button, width=8, command= lambda: self.clear_display())
+        elif button == "=":
+            b = tk.Button(self.master, text=button, width=8, command=lambda: self.calculate())
+        else:
+            b = tk.Button(self.master, text=button, width=8, command=lambda: self.click(button))
+
+        b.grid(row=row, column=col)
+
+       
+root = tk.Tk()
+root.title("Aplicacion de toma de calculadora")
+
+my_gui = Calculadora(root)
+
+root.mainloop()
+```
+
+### Desarrollo de aplicaciones GUI avanzado con CustomTkinter
+
+CustomTkinter es una extensión de la conocida biblioteca Tkinter de Python, diseñada para facilitar la creación de interfaces gráficas de usuario (GUI) con un estilo más moderno y personalizable. A continuación, te detallo sus características y diferencias con respecto a Tkinter tradicional:
+
+#### **Características de CustomTkinter**
+
+* **Estilo Moderno y Personalizable**: CustomTkinter ofrece widgets con un diseño más moderno y atractivo en comparación con los estándares de Tkinter. Estos widgets pueden personalizarse ampliamente en términos de colores, formas y efectos visuales.
+* **Facilidad de Uso**: Mantiene la simplicidad y facilidad de uso de Tkinter, permitiendo a los desarrolladores crear interfaces gráficas de manera intuitiva, pero con un aspecto visual más atractivo y profesional.
+* **Compatibilidad**: Es compatible con el código Tkinter existente, lo que permite a los desarrolladores mejorar las interfaces de aplicaciones existentes sin necesidad de reescribir todo desde cero.
+* **Widgets Mejorados**: Incluye versiones mejoradas de los widgets estándar de Tkinter, como botones, etiquetas, campos de texto, etc., con mejoras en la interactividad y el diseño.
+
+#### **Diferencias con Tkinter**
+
+* **Diseño Visual**: La diferencia más notable es el estilo visual. CustomTkinter proporciona un aspecto más moderno y elegante, mientras que Tkinter tiene un aspecto más tradicional y básico.
+* **Personalización de Widgets**: CustomTkinter permite una mayor personalización en la apariencia de los widgets, como temas oscuros, bordes redondeados, y efectos de animación, que no están disponibles directamente en Tkinter estándar.
+* **Facilidad de Transición**: Aunque CustomTkinter es una extensión, los desarrolladores familiarizados con Tkinter encontrarán la transición suave, ya que muchos de los conceptos y estructuras son similares.
+* **Comunidad y Soporte**: Tkinter, al ser una biblioteca más antigua y establecida, tiene una comunidad más grande y una amplia gama de recursos y documentación. CustomTkinter, siendo más nuevo, está en proceso de crecimiento en términos de comunidad y recursos disponibles.
+
+En resumen, CustomTkinter se posiciona como una excelente opción para los desarrolladores que buscan mejorar la estética y la funcionalidad de sus interfaces gráficas en Python, manteniendo al mismo tiempo la simplicidad y la familiaridad de Tkinter.
+
+### Chat Multiusuario con GUI y Cifrado E2E (1/5)
+
+En esta clase, nos enfocaremos en construir un chat multiusuario desde cero, utilizando conceptos avanzados como threading y socket para gestionar la comunicación en tiempo real. Se empleará Tkinter para crear una interfaz gráfica intuitiva, permitiendo a varios usuarios conectarse y conversar de manera efectiva.
+
+A lo largo de la clase, aprenderemos cómo estas herramientas pueden ser integradas para desarrollar una aplicación de chat robusta y funcional, explorando tanto la programación de back-end como de front-end para una experiencia de usuario completa.
+
+### Chat Multiusuario con GUI y Cifrado E2E (2/5)
+
+En esta clase, nos enfocaremos en construir un chat multiusuario desde cero, utilizando conceptos avanzados como threading y socket para gestionar la comunicación en tiempo real. Se empleará Tkinter para crear una interfaz gráfica intuitiva, permitiendo a varios usuarios conectarse y conversar de manera efectiva.
+
+A lo largo de la clase, aprenderemos cómo estas herramientas pueden ser integradas para desarrollar una aplicación de chat robusta y funcional, explorando tanto la programación de back-end como de front-end para una experiencia de usuario completa.
+
+### Chat Multiusuario con GUI y Cifrado E2E (3/5)
+
+En esta clase, nos enfocaremos en construir un chat multiusuario desde cero, utilizando conceptos avanzados como threading y socket para gestionar la comunicación en tiempo real. Se empleará Tkinter para crear una interfaz gráfica intuitiva, permitiendo a varios usuarios conectarse y conversar de manera efectiva.
+
+A lo largo de la clase, aprenderemos cómo estas herramientas pueden ser integradas para desarrollar una aplicación de chat robusta y funcional, explorando tanto la programación de back-end como de front-end para una experiencia de usuario completa.
+
+### Chat Multiusuario con GUI y Cifrado E2E (4/5)
+
+En esta clase, nos enfocaremos en construir un chat multiusuario desde cero, utilizando conceptos avanzados como threading y socket para gestionar la comunicación en tiempo real. Se empleará Tkinter para crear una interfaz gráfica intuitiva, permitiendo a varios usuarios conectarse y conversar de manera efectiva.
+
+A lo largo de la clase, aprenderemos cómo estas herramientas pueden ser integradas para desarrollar una aplicación de chat robusta y funcional, explorando tanto la programación de back-end como de front-end para una experiencia de usuario completa.
+
+### Chat Multiusuario con GUI y Cifrado E2E (5/5)
+
+En esta etapa final, daremos los toques finales a nuestro chat multiusuario, centrándonos en la seguridad y privacidad de las conversaciones. Utilizaremos la librería SSL y herramientas como OpenSSL para implementar un cifrado robusto.
+
+Aprenderemos cómo integrar estas tecnologías en nuestro chat para asegurar que las comunicaciones entre usuarios sean seguras y privadas. Esta sesión es crucial para entender la importancia del cifrado en aplicaciones de mensajería y cómo aplicarlo efectivamente en proyectos reales.
+
+A continuación, se proporcionan los comandos utilizados en la clase:
+
+* **openssl genpkey -algorithm RSA -out server-key.key -aes256**
+
+Esta instrucción genera una nueva clave privada RSA. La opción ‘-algorithm RSA‘ especifica el uso del algoritmo RSA. ‘-out server-key.key‘ indica que la clave generada se guardará en un archivo llamado ‘server-key.key‘. La opción ‘-aes256‘ significa que la clave privada será cifrada usando el algoritmo AES-256, lo que añade una capa de seguridad al requerir una contraseña para acceder a la clave.
+
+* **openssl req -new -key server-key.key -out server.csr**
+
+Esta línea crea una nueva Solicitud de Firma de Certificado (CSR) utilizando la clave privada RSA que generaste. ‘-new‘ indica que se trata de una nueva solicitud, ‘-key server-key.key‘ especifica que se usará la clave privada almacenada en ‘server-key.key‘, y ‘-out server.csr‘ guarda la CSR generada en un archivo llamado ‘server.csr‘. La CSR es necesaria para solicitar un certificado digital a una Autoridad Certificadora (CA).
+
+* **openssl x509 -req -days 365 -in server.csr -signkey server-key.key -out server-cert.pem**
+
+Este comando genera un certificado autofirmado basado en la CSR. ‘-req‘ indica que se está procesando una CSR, ‘-days 365‘ establece la validez del certificado por un año, ‘-in server.csr‘ especifica la CSR de entrada, ‘-signkey server-key.key‘ utiliza la misma clave privada para firmar el certificado, y ‘-out server-cert.pem‘ guarda el certificado generado en un archivo llamado ‘server-cert.pem‘.
+
+* **openssl rsa -in server-key.key -out server-key.key**
+
+Este comando se utiliza para quitar la contraseña de una clave privada RSA protegida. ‘-in server-key.key‘ especifica el archivo de la clave privada cifrada como entrada, y ‘-out server-key.key‘ indica que la clave privada sin cifrar se guardará en el mismo archivo. Al ejecutar este comando, se te pedirá la contraseña actual de la clave privada. Una vez proporcionada, OpenSSL generará una versión sin cifrar de la clave privada y la guardará en el mismo archivo, sobrescribiendo la versión cifrada.
+
+Este paso se hace a menudo para simplificar la automatización en entornos donde ingresar una contraseña manualmente no es práctico. Sin embargo, es importante ser consciente de que al eliminar la contraseña, la clave privada se vuelve más vulnerable al acceso no autorizado.
+
+---
+
+Codigo: **server.py**
+
+```python
+#!/usr/bin/env python3
+
+import socket, threading
+import tkinter as tk
+
+def client_thread(client_socket, clients, usernames):
+
+    username = client_socket.recv(1024).decode()
+    usernames[client_socket] = username
+
+    print(f"\n[+] El usuario {username} se ha conectado al chat")
+
+    for client in clients:
+        if client is not client_socket:
+            client.sendall(f"\n[+] El usuario {username} ha entrado al chat\n\n".encode())
+
+    while True:
+        try:
+            message = client_socket.recv(1024).decode()
+
+            if not message:
+                break
+
+            if message == "!usuarios":
+                client_socket.sendall(f"\n[+] Listado de usuarios disponibles: {', '.join(usernames.values())}\n\n".encode())
+                continue
+            for client in clients:
+                if client is not client_socket:
+                    client.sendall(f"{message}\n".encode())
+        except:
+            break
+    
+    client_socket.close()
+    clients.remove(client_socket)
+    del usernames[client_socket]
+
+def server_program():
+
+    host = "localhost"
+    port = 12345
+
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    server_socket.bind((host, port))
+    server_socket.listen()
+
+    print(f"\n[+] El servidor esta en escucha de conexiones entrantes...")
+
+    clients = []
+    usernames = {}
+
+    while True:
+
+        client_socket, address = server_socket.accept()
+        clients.append(client_socket)
+
+        print(f"\n[+] Se ha conectado un nuevo cliente: {address}")
+
+        thread = threading.Thread(target=client_thread, args=(client_socket, clients, usernames))
+        thread.daemon = True
+        thread.start()
+    
+    server_socket.close()
+
+if __name__ == "__main__" :
+    server_program()
+```
+
+---
+
+Codigo: **client.py**
+
+```python
+#!/usr/bin/env python3
+
+import socket, threading
+from tkinter import * 
+from tkinter.scrolledtext import ScrolledText
+
+def send_message(client_socket, username, text_widget, entry_widget):
+    message = entry_widget.get()
+    client_socket.sendall(f"{username} > {message}".encode())
+
+    entry_widget.delete(0, END)
+    text_widget.configure(state="normal")
+    text_widget.insert(END, f"{username} > {message}\n")
+    text_widget.configure(state="disable")
+
+
+def receive_message(client_socket, text_widget):
+    while True:
+        try:
+            message = client_socket.recv(1024).decode()
+
+            if not message:
+                break
+
+            text_widget.configure(state="normal")
+            text_widget.insert(END, message)
+            text_widget.configure(state="disable")
+
+        except:
+            break
+
+def list_users_request(client_socket):
+    client_socket.sendall("!usuarios".encode())
+
+def exit_request(client_socket, username, window):
+
+    client_socket.sendall(f"\n[!] El usuario ha abandonado el chat\n".encode())
+    client_socket.close()
+
+    window.quit()
+    window.destroy()
+
+def client_program():
+
+    host = "localhost"
+    port = 12345
+
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client_socket.connect((host, port))
+
+    username = input(f"\n[+] Introduce tu usuario: ")
+    client_socket.sendall(username.encode())
+
+    window = Tk()
+    window.title("Chat")
+
+    text_widget = ScrolledText(window, state="disabled")
+    text_widget.pack(padx=5, pady=5)
+
+    frame_widget = Frame(window)
+    frame_widget.pack(padx=5, pady=2, fill=BOTH, expand=1)
+
+    entry_widget = Entry(frame_widget, font=("Arial", 14))
+    entry_widget.bind("<Return>", lambda _: send_message( client_socket, username, text_widget, entry_widget))
+    entry_widget.pack(side=LEFT, fill=X, expand=1)
+
+    button_widget = Button(frame_widget, text="Enviar", command=lambda: send_message( client_socket, username, text_widget, entry_widget))
+    button_widget.pack(padx=5, pady=5, side=RIGHT)
+
+    users_widget = Button(window, text="Listar usuarios", command=lambda: list_users_request(client_socket))
+    users_widget.pack(padx=5, pady=5)
+
+    exit_widget = Button(window, text="Salir", command=lambda: exit_request(client_socket, username, window))
+    exit_widget.pack(padx=5, pady=5)
+
+    thread = threading.Thread(target=receive_message, args=(client_socket, text_widget))
+    thread.daemon = True
+    thread.start()
+
+    window.mainloop()
+    client_socket.close()
+
+if __name__ == "__main__":
+    client_program()
+```
